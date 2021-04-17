@@ -4,5 +4,5 @@
 
 [XML](doc/task-scheduler.xml)
 
-[diagram](doc/task-scheduler.jpg)
+![diagram](doc/task-scheduler.jpg)
 
