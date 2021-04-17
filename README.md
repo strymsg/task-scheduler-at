@@ -2,6 +2,6 @@
 
 ## Class diagram
 
-[XML](doc/task-scheduler.xml)
+[XML](doc/task-manager.xml)
 
-![diagram](doc/task-scheduler.jpg)
+![diagram](doc/task-manager.jpg)
