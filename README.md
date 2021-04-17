@@ -1,3 +1,8 @@
 # Task scheduler AT
 
-main repo for the project
+## Class diagram
+
+[XML](doc/task-scheduler.xml)
+
+[diagram](doc/task-scheduler.jpg)
+
