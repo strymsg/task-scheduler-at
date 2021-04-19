@@ -39,7 +39,8 @@ def parse_requirements(filename):
 if __name__ == '__main__':
     setup(
         name='task_scheduler',
-        description='Task Manager and Scheduler',
+        description='Task Manager',
+        install_requires='requirements',
         long_description='\n\n'.join([readme, changes]),
         license='MIT license',
         url='https://github.com/strymsg/task-scheduler-at',
