@@ -35,11 +35,11 @@ class ApiRequestTask(AbstractTask):
         try:
             # TODO: add support to send api_token
             response = requests.request(
-                self.config['http_method'].upper(),
-                self.config['url'],
+                self.config.http_method.upper(),
+                self.config.url,
                 params=None,
-                data=self.confg['body'],
-                headers=self.config['headers'],
+                data=self.config.body,
+                headers=self.config.headers,
                 cookies=None,
                 files=None,
                 auth=None,
@@ -60,7 +60,7 @@ class ApiRequestTask(AbstractTask):
                 'json': response_json,
                 'text': response.text,
                 'status_code': response.status_code,
-                'headers': response_json.headers,
+                'headers': response.headers,
                 'url': response.url
             }
             return res_dict
