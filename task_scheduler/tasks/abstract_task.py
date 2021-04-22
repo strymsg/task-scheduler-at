@@ -1,4 +1,5 @@
 from datetime import datetime
+from abc import abstractmethod
 
 class AbstractTask:
     def __init__(self, priority=0, type=''):
@@ -17,6 +18,7 @@ class AbstractTask:
     def task_id(self, value):
         self._task_id = value
 
+    @abstractmethod
     def execute(self):
-        '''this method should be implemented'''
         pass
+

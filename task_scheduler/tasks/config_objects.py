@@ -1,3 +1,5 @@
+from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, RedisDbConnection
+
 class ConfigObject:
     def __init__(self, args={}):
         self.args = args
@@ -42,30 +44,25 @@ class ConfigApiRequestTask(ConfigObject):
 
 
 class ConfigDbTask(ConfigObject):
-    def __init__(self, db_name, db_host='localhost', username='',
-                 password='', port=4000, query=''):
-        self.db_name = db_name
-        self.db_host = db_host
-        self.username = username
-        self.password = password
-        self.port = port
+    def __init__(self, query:str, db_connection:AbstractDbConnector):
+        self.db_connection = db_connection
         self.query = query
         super().__init__({
-            'db_name': db_name,
-            'db_host': db_host,
-            'username': username,
-            'password': password,
-            'port': port,
+            'db_name': self.db_connection.db_name,
+            'db_host': self.db_connection.db_host,
+            'username': self.db_connection.username,
+            'password': self.db_connection.password,
+            'port': self.db_connection.port,
             'query': query
         })
 
-    def config(self, dict):
-        self.db_name = dict.get('db_name', '')
-        self.db_host = dict.get('db_host', 'localhost')
-        self.username = dict.get('username', '')
-        self.password = dict.get('password', '')
-        self.port = dict.get('port', '')
-        self.query = dict.get('query', '')
+    # def config(self, dict):
+    #     self.db_connection.db_name = dict.get('db_name', '')
+    #     self.db_connection.db_host = dict.get('db_host', 'localhost')
+    #     self.db_connection.username = dict.get('username', '')
+    #     self.db_connection.password = dict.get('password', '')
+    #     self.db_connection.port = dict.get('port', '')
+    #     self.query = dict.get('query', '')
 
 class ConfigFileTask(ConfigObject):
     def __init__(self, location,
