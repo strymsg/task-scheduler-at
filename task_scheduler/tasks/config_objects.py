@@ -1,4 +1,4 @@
-from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, RedisDbConnection
+from abstract_db_connector import AbstractDbConnector, RedisDbConnection
 
 class ConfigObject:
     def __init__(self, args={}):
@@ -13,10 +13,6 @@ class ConfigObject:
     @config_id.setter
     def config_id(self, value):
         self._config_id = value
-
-    def config(self):
-        """ Derived classes should implement this"""
-        pass
 
 
 class ConfigApiRequestTask(ConfigObject):
@@ -35,13 +31,6 @@ class ConfigApiRequestTask(ConfigObject):
             'headers': headers
         })
 
-    def config(self, dict):
-        self.url = dict.get('url', '')
-        self.http_method = dict.get('http_method', 'get')
-        self.body = dict.get('body',{})
-        self.api_token = dict.get('http_token', '')
-        self.headers = dict.get('headers', '')
-
 
 class ConfigDbTask(ConfigObject):
     def __init__(self, query:str, db_connection:AbstractDbConnector):
@@ -56,14 +45,6 @@ class ConfigDbTask(ConfigObject):
             'query': query
         })
 
-    # def config(self, dict):
-    #     self.db_connection.db_name = dict.get('db_name', '')
-    #     self.db_connection.db_host = dict.get('db_host', 'localhost')
-    #     self.db_connection.username = dict.get('username', '')
-    #     self.db_connection.password = dict.get('password', '')
-    #     self.db_connection.port = dict.get('port', '')
-    #     self.query = dict.get('query', '')
-
 class ConfigFileTask(ConfigObject):
     def __init__(self, location,
                  file_content='', file_encoding='utf-8', type='read'):
@@ -77,9 +58,3 @@ class ConfigFileTask(ConfigObject):
             'file_encoding': file_encoding,
             'type': type
         })
-
-    def config(self, dict):
-        self.location = dict.get('location', '')
-        self.file_content = dict.get('file_content', '')
-        self.file_encoding = dict.get('file_encoding', 'utf-8')
-        self.type = dict.get('type', 'read')
