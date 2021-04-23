@@ -62,8 +62,8 @@ class MongoDbConnection(AbstractDbConnector):
             except ConnectionFailure as err:
                 return("Connection Failure") #Testing
             # finally:
-            #     self.client.close()
-            return "Connection establish" #Testing
+                # self.client.close()
+            # return "Connection establish" 
         else:
             raise Exception("You can't create another MongoDbConnection class")
 
@@ -78,28 +78,39 @@ class MongoDbConnection(AbstractDbConnector):
     def insert(self, params):
         try:
             if self.client[self.db_name].collection1.count_documents(params, limit = 1):
-                print("This document already has this data")
-            else: 
-                self.client[self.db_name].collection1.insert_many([params])
+                return("This document already has this data") #Testing
+            else:
+                result = self.client[self.db_name].collection1.insert_many([params])
+                return result.acknowledged
+
         except ConnectionFailure as err:
             # return(err)
             return "Connection failure" #Testing
 
     def get(self, criteria):
         try:
-            return self.client[self.db_name].collection1.find(criteria)
+            result = self.client[self.db_name].collection1.find(criteria)
+            for collection in result:
+                collection.pop("_id")
+                return(collection)
+
         except ConnectionFailure as err:
             # return(err)
             return "Connection failure" #Testing
+
     def delete(self, criteria):
         try:
-            self.client[self.db_name].collection1.delete_one(criteria) 
+            result = self.client[self.db_name].collection1.delete_one(criteria) 
+            return(result.deleted_count)
+
         except ConnectionFailure as err:
             # return(err)
             return "Connection failure" #Testing
+            
     def update(self, criteria, params):
         try:
-            self.client[self.db_name].collection1.update_one(criteria, params) 
+            result = self.client[self.db_name].collection1.update_one(criteria, params) 
+            return(result.matched_count)
         except ConnectionFailure as err:
             # return(err)
             return "Connection failure" #Testing

@@ -28,5 +28,11 @@ db_task = DbTask(priority=0, config=config1)
 db_task.config.db_connection.insert(data)
 
 
-# db_task.config.db_connection.get()
+print(db_task.config.db_connection.get({"limit": {"$eq":48.90}}))
+# db_task.config.db_connection.get({"limit":48.9})
+
+# db_task.config.db_connection.delete({"limit": 48.50})
+
+print(db_task.config.db_connection.update({"limit": {"$eq":48.90}}, {"$set":{"limit":80}}))
+
 # mongo_client2 = MongoDbConnection(None,None,None,None,None)
