@@ -39,7 +39,8 @@ class AbstractDbConnector:
 
 class MongoDbConnection(AbstractDbConnector):
 
-    __instance__ = None
+    __number_of_connections = 0
+    __connections = {}
 
     def __init__(
             self, 
@@ -51,12 +52,23 @@ class MongoDbConnection(AbstractDbConnector):
         """ Constructor.
         """
         super().__init__(db_name, db_host, username, password, port)
-        
-        if MongoDbConnection.__instance__ is None:
-            MongoDbConnection.__instance__ = self
-        else:
-            raise Exception("You can't create another MongoDbConnection class")
-        
+
+        for num_connection, config in MongoDbConnection.__connections.items():
+            if config["db_name"] == db_name and config["db_host"] == db_host \
+                and config["username"] == username and config["password"] == password \
+                and config["port"] == port:
+                
+                raise Exception("You can't create another MongoDbConnection class")
+        MongoDbConnection.__number_of_connections +=1
+        MongoDbConnection.__connections[MongoDbConnection.__number_of_connections] \
+            = {
+                "db_name" : db_name,
+                "db_host" : db_host,
+                "username" : username,
+                "password" : password,
+                "port" : port
+            }
+
     def connect(self):
         self.client = MongoClient(
                     host=self.db_host, 
@@ -73,15 +85,6 @@ class MongoDbConnection(AbstractDbConnector):
             return "Connection Establish" 
         except ServerSelectionTimeoutError as err:
             raise(err)
-
-
-    @staticmethod
-    def get_connection():
-        """ Static method to fetch the current instance.
-        """
-        if not MongoDbConnection.__instance__:
-            MongoDbConnection()
-        return MongoDbConnection.__instance__    
 
     
     def insert(self, params):
@@ -115,7 +118,8 @@ class MongoDbConnection(AbstractDbConnector):
 
 class RedisDbConnection(AbstractDbConnector):
 
-    __instance__ = None
+    __number_of_connections = 0
+    __connections = {}
 
     def __init__(
             self, 
@@ -128,11 +132,21 @@ class RedisDbConnection(AbstractDbConnector):
         """
         super().__init__(db_name, db_host, username, password, port)
 
-        if RedisDbConnection.__instance__ is None:
-            RedisDbConnection.__instance__ = self
-        else:
-            raise Exception("You can't create another RedisDbConnection class")
-
+        for num_connection, config in RedisDbConnection.__connections.items():
+            if config["db_name"] == db_name and config["db_host"] == db_host \
+                and config["username"] == username and config["password"] == password \
+                and config["port"] == port:
+                
+                raise Exception("You can't create another RedisDbConnection class")
+        RedisDbConnection.__number_of_connections +=1
+        RedisDbConnection.__connections[RedisDbConnection.__number_of_connections] \
+            = {
+                "db_name" : db_name,
+                "db_host" : db_host,
+                "username" : username,
+                "password" : password,
+                "port" : port
+            }
 
     def connect(self):
         self.client = Redis(
@@ -144,6 +158,7 @@ class RedisDbConnection(AbstractDbConnector):
         response = self.__check_connection_to_db()  
         return response
 
+
     def __check_connection_to_db(self):
         try:
             self.client.ping()
@@ -152,19 +167,10 @@ class RedisDbConnection(AbstractDbConnector):
             raise(err)
 
 
-    @staticmethod
-    def get_connection():
-        """ Static method to fetch the current instance.
-        """
-        if not RedisDbConnection.__instance__:
-            RedisDbConnection()
-        return RedisDbConnection.__instance__   
-
-
     def insert(self, params, key):
         self.__check_connection_to_db()
         if self.client.exists(key) > 0:
-            return("This document already has this data")  # Testing
+            return("This document already has this data")
         else:
             result = self.client.hmset(key, params)
             return result  # True
