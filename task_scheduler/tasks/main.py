@@ -1,10 +1,9 @@
-from db_task import DbTask
-from config_objects import ConfigDbTask
+from task_scheduler.tasks.db_task import DbTask
+from task_scheduler.tasks.config_objects import ConfigDbTask
 from pymongo import MongoClient
 from redis import Redis
 from pprint import pprint
-from abstract_db_connector import MongoDbConnection
-from abstract_db_connector import RedisDbConnection
+from task_scheduler.tasks.abstract_db_connector import MongoDbConnection, RedisDbConnection
 import json
 
 data = {

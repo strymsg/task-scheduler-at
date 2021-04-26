@@ -1,7 +1,5 @@
-import sys
-sys.path.append("C:\\Users\\ecris\\Desktop\AT_Bootcamp\\task-scheduler-at\\task_scheduler\\tasks")
 from redis import Redis
-from abstract_db_connector import RedisDbConnection
+from task_scheduler.tasks.abstract_db_connector import RedisDbConnection
 from unittest import TestCase
 import pytest
 
@@ -28,7 +26,12 @@ class TestRedisDbConnection(TestCase):
     #             password=None, 
     #             port=6379),
 
-    #         RedisDbConnection.get_connection()
+    #         RedisDbConnection(
+    #             db_name="1", 
+    #             db_host="localhost", 
+    #             username=None, 
+    #             password=None, 
+    #             port=6379),
     #         ]
 
     # def tearDown(self):

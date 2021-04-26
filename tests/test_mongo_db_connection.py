@@ -1,10 +1,7 @@
-import sys
-sys.path.append("C:\\Users\\ecris\\Desktop\AT_Bootcamp\\task-scheduler-at\\task_scheduler\\tasks")
 from pymongo import MongoClient
-from abstract_db_connector import MongoDbConnection
+from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 from unittest import TestCase
 import pytest
-
 
 
 data = {
@@ -28,9 +25,14 @@ class TestMongoDbConnection(TestCase):
     #             password=None, 
     #             port=27017),
 
-    #         MongoDbConnection.get_connection()
+    #         MongoDbConnection(
+    #             db_name="dbtest2", 
+    #             db_host="localhost", 
+    #             username=None, 
+    #             password=None, 
+    #             port=27017)
     #         ]
-
+    
     # def tearDown(self):
     #     del self.cases
 
@@ -48,8 +50,8 @@ class TestMongoDbConnection(TestCase):
         del self.case_single_connection
         
     def test_multiple_connection(self):
-        for instance in self.cases:
-            self.assertIsInstance(instance, MongoDbConnection)
+        for instance, _ in enumerate(self.cases):
+            self.assertEqual(self.cases[instance].connect(),"Connection Establish")
 
     def test_single_connection(self):
         self.assertEqual(self.case_single_connection.connect(),"Connection Establish")
@@ -61,7 +63,7 @@ class TestMongoDbConnection(TestCase):
 
     def test_insert_new_data(self):
         self.case_single_connection.connect()
-        self.assertTrue(self.case_single_connection.insert(data))
+        self.assertEqual(self.case_single_connection.insert(data),True)
 
     def test_get_data(self):
         self.case_single_connection.connect()

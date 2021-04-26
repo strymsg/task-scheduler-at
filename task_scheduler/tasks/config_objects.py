@@ -1,4 +1,4 @@
-from abstract_db_connector import AbstractDbConnector, RedisDbConnection
+from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, RedisDbConnection
 
 class ConfigObject:
     def __init__(self, args={}):
