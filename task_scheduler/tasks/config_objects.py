@@ -15,8 +15,6 @@ class ConfigObject:
     def config(self):
         """ Derived classes should implement this"""
         pass
-
-
 class ConfigApiRequestTask(ConfigObject):
     def __init__(self,
                  url, http_method='get', body={}, api_token='', headers={}):
