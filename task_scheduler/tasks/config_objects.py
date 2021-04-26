@@ -14,7 +14,6 @@ class ConfigObject:
     def config_id(self, value):
         self._config_id = value
 
-
 class ConfigApiRequestTask(ConfigObject):
     def __init__(self,
                  url, http_method='get', body={}, api_token='', headers={}):
