@@ -1,0 +1,11 @@
+TEST STRATEGY
+Today, we look at a few concepts
+important for developing a testing
+strategy:
+• Test cases
+• Comparing test techniques in terms of
+their strengths and blind spots
+• Context factors that influence test
+strategy
+• Information objectives that drive test
+strategy
