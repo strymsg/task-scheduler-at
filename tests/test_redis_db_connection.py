@@ -1,7 +1,7 @@
 import sys
 sys.path.append("C:\\Users\\ecris\\Desktop\AT_Bootcamp\\task-scheduler-at\\task_scheduler\\tasks")
-from pymongo import MongoClient
-from abstract_db_connector import MongoDbConnection
+from redis import Redis
+from abstract_db_connector import RedisDbConnection
 from unittest import TestCase
 import pytest
 
@@ -15,20 +15,20 @@ data = {
    "client": "Crude Traders Inc."
    }
 
-class TestMongoDbConnection(TestCase):
+class TestRedisDbConnection(TestCase):
 
     """Test cases -> Multiple connection """
     # def setUp(self):
         
     #     self.cases = [
-    #         MongoDbConnection(
-    #             db_name="dbtest1", 
+    #         RedisDbConnection(
+    #             db_name="0", 
     #             db_host="localhost", 
     #             username=None, 
     #             password=None, 
-    #             port=27017),
+    #             port=6379),
 
-    #         MongoDbConnection.get_connection()
+    #         RedisDbConnection.get_connection()
     #         ]
 
     # def tearDown(self):
@@ -37,19 +37,19 @@ class TestMongoDbConnection(TestCase):
 
     """Test cases -> Single connection """
     def setUp(self):
-        self.case_single_connection = MongoDbConnection(
-                db_name="dbtest1", 
+        self.case_single_connection = RedisDbConnection(
+                db_name="0", 
                 db_host="localhost", 
                 username=None, 
                 password=None, 
-                port=27017)
-        
+                port=6379)
+    
     def tearDown(self):
         del self.case_single_connection
         
     def test_multiple_connection(self):
         for instance in self.cases:
-            self.assertIsInstance(instance, MongoDbConnection)
+            self.assertIsInstance(instance, RedisDbConnection)
 
     def test_single_connection(self):
         self.assertEqual(self.case_single_connection.connect(),"Connection Establish")
@@ -57,26 +57,27 @@ class TestMongoDbConnection(TestCase):
     def test_insert_data_already_stored(self):
         self.case_single_connection.connect()
         expected = "This document already has this data"
-        self.assertEqual(self.case_single_connection.insert(data), expected)
+        self.assertEqual(self.case_single_connection.insert(data, "DATA1"), expected)
 
     def test_insert_new_data(self):
         self.case_single_connection.connect()
-        self.assertTrue(self.case_single_connection.insert(data))
+        self.assertTrue(self.case_single_connection.insert(data, "DATA1"))
 
     def test_get_data(self):
         self.case_single_connection.connect()
-        query = {"qty":510}
+        query = "DATA1"
         self.assertEqual(self.case_single_connection.get(query),data)
 
     def test_delete_data(self):
         self.case_single_connection.connect()
-        self.case_single_connection.insert(data)
-        query = {"qty":510}
-        self.assertEqual(self.case_single_connection.delete(query),1)
+        self.case_single_connection.insert(data, "DATA1")
+        query = "DATA1"
+        expected = "Delete operation was successful"
+        self.assertEqual(self.case_single_connection.delete(query), expected)
 
-    def test_update_data(self):
-        self.case_single_connection.connect()
-        self.case_single_connection.insert(data)
-        query = {"limit": {"$eq":48.90}}
-        field = {"$inc":{"qty":+500}}
-        self.assertEqual(self.case_single_connection.update(query,field),1)
+    # def test_update_data(self):
+    #     self.case_single_connection.connect()
+    #     self.case_single_connection.insert(data)
+    #     query = {"limit": {"$eq":48.90}}
+    #     field = {"$inc":{"qty":+500}}
+    #     self.assertEqual(self.case_single_connection.update(query,field),1)
