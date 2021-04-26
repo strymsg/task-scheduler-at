@@ -8,18 +8,19 @@ from task_scheduler.tasks.file_task import FileTask
 
 class TestFileTask(TestCase):
     def setUp(self):
-        __location__ = path.realpath(
+        self.__location__ = path.realpath(
             path.join(getcwd(), path.dirname(__file__)))
         self.config_existent = ConfigFileTask(
-            location=path.join(__location__,
+            location=path.join(self.__location__,
                                'res', 'testfile.txt'),
             file_encoding='utf-8',
             type='read')
         self.config_nonexistenfile = ConfigFileTask(
             location='inexistente')
         self.config_writefile = ConfigFileTask(
-            location=path.join(__location__, 'res', 'testfile.txt'),
+            location=path.join(self.__location__, 'res', 'testwrite.txt'),
             file_encoding='utf-8',
+            file_content='Contenido de pruebas',
             type='write'
         )
     def tearDown(self):
@@ -39,6 +40,22 @@ class TestFileTask(TestCase):
         try:
             file_task.execute()
             self.assertTrue(True)
-        except Exception as E:
-            print(E)
-            self.assertFalse(True)
+
+            file_task1 = FileTask(0, config=ConfigFileTask(
+                location=path.join(self.__location__,
+                                   'res', 'testwrite.txt'),
+                file_encoding='utf-8',
+                type='read'
+            ))
+            content = file_task1.execute()
+            self.assertEqual(content, 'Contenido de pruebas')
+        except Exception as err:
+            self.assertFalse(True, msg=str(err))
+
+    def test_readfail(self):
+        file_task = FileTask(0, config=self.config_nonexistenfile)
+        try:
+            file_task.execute()
+            self.assertFalse(False, msg="This sould fail instead")
+        except Exception as err:
+            self.assertTrue(True, msg=f'expected exception {type(err)}')
