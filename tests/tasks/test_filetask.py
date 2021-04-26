@@ -15,9 +15,10 @@ class TestFileTask(TestCase):
                                'res', 'testfile.txt'),
             file_encoding='utf-8',
             type='read')
-        self.config_nonexistenfile = ConfigFileTask(location='nonexists')
+        self.config_nonexistenfile = ConfigFileTask(
+            location='inexistente')
         self.config_writefile = ConfigFileTask(
-            location=path.join(curdir, 'res', 'testfile.txt'),
+            location=path.join(__location__, 'res', 'testfile.txt'),
             file_encoding='utf-8',
             type='write'
         )
@@ -32,3 +33,12 @@ class TestFileTask(TestCase):
         #print(content)
         self.assertTrue(content.startswith('TEST STRATEGY'))
         self.assertTrue(content.endswith('strategy'))
+
+    def test_writefile(self):
+        file_task = FileTask(0, config=self.config_writefile)
+        try:
+            file_task.execute()
+            self.assertTrue(True)
+        except Exception as E:
+            print(E)
+            self.assertFalse(True)
