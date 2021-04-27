@@ -127,10 +127,16 @@ All task documents will be embedding inside a **Scheduler** document:
     "username": "",
     "db_host": "localhost"
   },
-  tasks: [
-    ObjectID("task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad_04/27/2021 13:35:35"),
-    ObjectID("task_File_12f1bd71-f441-4519-8a41-44643ccb4def_04/26/2021 13:35:35"),
-    ObjectID("task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c_04/27/2021 13:35:35"
-  ]
+  "tasks": {
+    "ApiRequests": [
+      ObjectID("task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad_04/27/2021 13:35:35")
+    ],
+    "Db": [
+      ObjectID("task_File_12f1bd71-f441-4519-8a41-44643ccb4def_04/26/2021 13:35:35")
+    ],
+    "File": [
+      ObjectID("task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c_04/27/2021 13:35:35")
+    ]
+  }
 }
 ```
