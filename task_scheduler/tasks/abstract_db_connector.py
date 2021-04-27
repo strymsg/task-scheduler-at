@@ -101,7 +101,7 @@ class MongoDbConnection(AbstractDbConnector):
         result = self.client[self.db_name].collection1.find(criteria)
         for collection in result:
             collection.pop("_id")
-            return(collection)
+        return(collection)
 
 
     def delete(self, criteria):
@@ -154,7 +154,8 @@ class RedisDbConnection(AbstractDbConnector):
                         port=self.port,
                         db=int(self.db_name), 
                         username=self.username,
-                        password=self.password)
+                        password=self.password,
+                        decode_responses=True)
         response = self.__check_connection_to_db()  
         return response
 

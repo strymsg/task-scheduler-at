@@ -43,12 +43,12 @@ config2 = ConfigDbTask(query={},db_connection=mongo_client_2)
 db_task2 = DbTask(priority=0, config=config2)
 print(db_task2.config.db_connection.insert(data))
 
-mongo_client4 = MongoDbConnection(
-                        db_name="dbtest1", 
-                        db_host="localhost", 
-                        username=None, 
-                        password=None, 
-                        port=27017)
+# mongo_client4 = MongoDbConnection(
+#                         db_name="dbtest1", 
+#                         db_host="localhost", 
+#                         username=None, 
+#                         password=None, 
+#                         port=27017)
 
 # ------------------------------------------------------------
 
