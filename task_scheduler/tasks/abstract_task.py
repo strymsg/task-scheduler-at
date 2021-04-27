@@ -4,6 +4,12 @@ from abc import abstractmethod
 
 class AbstractTask:
     def __init__(self, priority=0, type=''):
+        '''Initializates the AbstractTask and generates assigns an
+        unique task_id as combintaion of:
+        task_{type}_{uuid4}_{creation_time in format ("%m/%d/%Y %H:%M:%S")}
+
+        :return Class instance
+        '''
         self.priority = priority
         self.creation_time = datetime.now()
         self.type = type
