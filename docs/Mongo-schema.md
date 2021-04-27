@@ -43,7 +43,7 @@
   }
 }
 ```
-**ConfigFileTask**:
+**FileTask**:
 ```json
 {
   "_id": "ObjectId()",
