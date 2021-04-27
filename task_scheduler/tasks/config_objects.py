@@ -1,7 +1,10 @@
 from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, RedisDbConnection
+import logging
 
 class ConfigObject:
     def __init__(self, args={}):
+        self.logger = logging.getLogger()
+        self.logger.info("Config ob.....")
         self.args = args
         # TODO: Define how to get the config_id property
         self._config_id = ''
