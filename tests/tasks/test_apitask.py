@@ -41,6 +41,8 @@ def config_api_delete():
 @pytest.fixture
 def api_task(config_api_get):
     apitask = ApiRequestTask(0, config=config_api_get)
+    assert apitask.task_id != ''
+    #print('id:', apitask.task_id)
     return apitask
 
 def test_apitask(api_task):

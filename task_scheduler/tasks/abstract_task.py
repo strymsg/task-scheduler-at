@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from abc import abstractmethod
 
@@ -7,8 +8,11 @@ class AbstractTask:
         self.creation_time = datetime.now()
         self.type = type
         self.execution_information = None
-        # TODO: Define how to get the task_id
-        self._task_id = ''
+
+        # For instance:
+        # task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad_04/27/2021 13:35:35
+        self._task_id = \
+            f'task_{type}_{uuid.uuid4()}_{self.creation_time.strftime("%m/%d/%Y %H:%M:%S")}'
 
     @property
     def task_id(self):
