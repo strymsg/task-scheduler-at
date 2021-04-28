@@ -1,121 +1,123 @@
-## Mongo Schema
+# Mongo Schema
 
-**ApiRequestTask**:
+Proposed schema:
+
+```
+Scheduler{
+  ref: Tasks {
+    ref: configs {
+	  {schedule}
+    }
+	ref: task_result {
+	}
+  }
+}
+```
+  - An Scheduler object contains a **reference** to every task
+  - A task has a **reference** to a config (there exists 3 types of configs)
+  - A config **embbeds** a schedule.
+  - A task **reference** to a task result
+
+## Documents
+
+### Task
+
 ```json
 {
   "_id": "ObjectId()",
-  "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad_04/27/2021 13:35:35",
+  "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad",
   "creation_time": "04/27/2021 13:35:35",
   "priority": 0,
   "type": "Api-request",
-  "execution_information": {
-    "last_execution": "04/27/2021 14:00:00",
-    "executions": [
-      {
-	"time": "04/27/2021 14:00:00",
-	"error_message": "",
-	"result": "status_code: 200",
-      },
-      {
-	"time": "04/27/2021 13:45:00",
-	"error_message": "Internal server error.",
-	"result": "status_code: 500",
-      }
-    ],
+  "configs": [ObjectID("config_1"), ObjectID("config_2")],
+  "task_results": [ObjectID("taskResult_1"), ObjectID("taskResult_2")]
+}
+```
+### Config
+
+For Api-request
+
+```json
+{
+  "config_id": "config_1521bd71-f491-89a3-7a41-4462ccb791ad",
+  "type": "Api-request",
+  "url": "https://reqbin.com/echo/post/json",
+  "http_method": "POST",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json"
   },
-  "config": {
-    "url": "https://reqbin.com/echo/post/json",
-    "http_method": "POST",
-    "headers": { "Accept": "application/json", "Content-Type": "application/json" },
-    "body": {
-       "Id": 78912,
-       "Customer": "Jason Sweet",
-       "Quantity": 1,
-       "Price": 18.00      
-    },
-    "api_token": ""
+  "body": {
+     "Id": 78912,
+     "Customer": "Jason Sweet",
+     "Quantity": 1,
+     "Price": 18.00      
   },
+  "api_token": "",
   "schedule": {
-    "scheduled_id": "schedule_1521bd71-f491-89a3-7a41-4462ccb791ad_04/27/2021 13:35:35",
     "type": "periodic",
     "every": 15,
     "unit": "minutes"
   }
 }
+
 ```
-**FileTask**:
+
+For Db
+
 ```json
 {
-  "_id": "ObjectId()",
-  "task_id": "task_File_12f1bd71-f441-4519-8a41-44643ccb4def_04/26/2021 13:35:35",
-  "creation_time": "04/27/2021 13:35:35",
-  "priority": 0,
-  "type": "File",
-  "execution_information": {
-    "last_execution": "04/26/2021 16:00:00",
-    "executions": [
-      {
-	"time": "04/26/2021 16:00:00",
-	"error_message": "",
-	"result": "done.",
-      },
-    ],
-  },
-  "config": {
-    "location": "nuevo_archivo.txt",
-    "type": "write",
-    "file_content": "probando contenido...",
-    "file_encoding": "utf-8"
+  "config_id": "config_3391bd81-f491-89a3-7d41-4412ccb79111",
+  "type": "Db",
+  "query_type": "update",
+  "query": "HSET clave1 nuevovalor",
+  "connector": {
+    "db_name": "1",
+    "port": 6379,
+    "password": "",
+    "username": "",
+    "db_host": "localhost"
   },
   "schedule": {
-    "scheduled_id": "schedule_e921bd71-b491-19a3-ba4d-7492ccb79180_04/26/2021 13:35:35",
-    "type": "specific",
-    "time": "04/26/2021 16:00:00"
-  }
-}
-```
-**DbTask**:
-```json
-{
-  "_id": "ObjectId()",
-  "task_id": "task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c_04/27/2021 13:35:35",
-  "creation_time": "04/27/2021 12:35:35",
-  "priority": 0,
-  "type": "File",
-  "execution_information": {
-    "last_execution": "04/26/2021 16:00:00",
-    "executions": [
-      {
-	"time": "04/26/2021 16:00:00",
-	"error_message": "",
-	"result": "Ok.",
-      },
-      {
-	"time": "04/26/2021 12:00:00",
-	"error_message": "Reference error....",
-	"result": "Reference error....",
-      },
-    ],
-  },
-  "config": {
-    "type": "update",
-    "query": "HSET clave1 nuevovalor",
-    "connector": {
-      "db_name": "1",
-      "port": 6379,
-      "password": "",
-      "username": "",
-      "db_host": "localhost"
-    }
-  },
-  "schedule": {
-    "scheduled_id": "schedule_aa21bd71-e491-18c5-ba59-7492ccb79180_04/26/2021 13:35:35",
     "type": "periodic",
     "every": 12,
     "unit": "hours"
   }
 }
 ```
+
+For file
+
+```json
+{
+  "config_id": "config_cc91b571-6291-19aa-7db1-2d1273b79190",
+  "type": "File",
+  "location": "nuevo_archivo.txt",
+  "file_operation": "write",
+  "file_content": "probando contenido...",
+  "file_encoding": "utf-8"
+  },
+  "schedule": {
+    "type": "specific",
+    "time": "04/26/2021 16:00:00"
+  }
+}
+```
+
+### TaskResult
+
+```json
+{
+  "task_result_id": "task-result_1234bc71-e29d-89aa-3db1-90c273b7919b",
+  "last_execution": "04/27/2021 14:00:00",
+  "time": "04/27/2021 14:00:00",
+  "error_message": "",
+  "result": "status_code: 200"
+}
+```
+
+### Scheduler
+
 All task documents will be embedding inside a **Scheduler** document:
 
 ```json
@@ -129,13 +131,13 @@ All task documents will be embedding inside a **Scheduler** document:
   },
   "tasks": {
     "ApiRequests": [
-      ObjectID("task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad_04/27/2021 13:35:35")
+      ObjectID("task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad")
     ],
     "Db": [
-      ObjectID("task_File_12f1bd71-f441-4519-8a41-44643ccb4def_04/26/2021 13:35:35")
+      ObjectID("task_File_12f1bd71-f441-4519-8a41-44643ccb4def")
     ],
     "File": [
-      ObjectID("task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c_04/27/2021 13:35:35")
+      ObjectID("task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c")
     ]
   }
 }
