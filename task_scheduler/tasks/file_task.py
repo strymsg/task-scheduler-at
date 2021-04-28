@@ -11,13 +11,38 @@ class FileTask(AbstractTask):
         self.config = config
 
     def read_file(self):
-        # TODO: implement
-        pass
+        '''Reads the file in the config.location
+         and returns it's contents. Raises exception if error occurs
+        '''
+        try:
+            with open(self.config.location, encoding=self.config.file_encoding) as f:
+                return f.read()
+        except Exception as err:
+            # TODO: Log
+            raise err
 
     def write_file(self):
-        # TODO: implement
-        pass
+        '''Writes to the config.location using the content in config.file_content
+        and config.file_enconding encoding. Raises exception if error occurs
+        '''
+        try:
+            with open(self.config.location,
+                      encoding=self.config.file_encoding, mode='w') as f:
+                f.write(self.config.file_content)
+        except Exception as err:
+            # TODO: Log
+            raise err
 
     def execute(self):
-        # TODO: implement
-        pass
+        if self.config.type.lower() == 'write':
+            try:
+                self.write_file()
+            except Exception as err:
+                # TODO: log
+                raise err
+        elif self.config.type.lower() == 'read':
+            try:
+                return self.read_file()
+            except Exception as err:
+                # TODO: log
+                raise err
