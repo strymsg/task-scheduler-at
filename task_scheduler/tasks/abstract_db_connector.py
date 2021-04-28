@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from redis import Redis
 from pymongo.errors import ServerSelectionTimeoutError, \
     AutoReconnect, ConnectionFailure, ConfigurationError, OperationFailure
-from redis.exceptions import ConnectionError 
+from redis.exceptions import ConnectionError, TimeoutError, RedisError
 
 class AbstractDbConnector:
     def __init__(
@@ -87,33 +87,60 @@ class MongoDbConnection(AbstractDbConnector):
             raise(err)
 
     
-    def insert(self, params):
-        self.__check_connection_to_db()
-        if self.client[self.db_name].collection1.count_documents(params, limit = 1):
-            return("This document already has this data") 
-        else:
-            result = self.client[self.db_name].collection1.insert_many([params])
-            return result.acknowledged
+    def insert(self, collection, params):
+        try:
+            if self.client[self.db_name][collection].count_documents(params, limit = 1):
+                return("This document already has this data") 
+            else:
+                result = self.client[self.db_name][collection].insert_one(params)
+                return result.acknowledged
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
 
 
-    def get(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.find(criteria)
-        for collection in result:
-            collection.pop("_id")
-        return(collection)
+    def get(self, collection, criteria):
+        try:
+            result = []
+            for collect in self.client[self.db_name][collection].find(criteria):
+                collect.pop("_id")
+                result.append(collect)
+            if not result:
+                message = "Nothing was found"
+                return message
+            else:
+                return result
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
 
 
-    def delete(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.delete_one(criteria) 
-        return(result.deleted_count)
-
+    def delete(self, collection, criteria):
+        try:
+            result = self.client[self.db_name][collection].delete_many(criteria) 
+            if result.deleted_count == 0:
+                return "Nothing was deleted"
+            else:
+                return f"Delete operation was successful ({result.deleted_count})"
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
             
-    def update(self, criteria, params):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.update_one(criteria, params) 
-        return(result.matched_count)
+
+    def update(self, collection, criteria, params):
+        try:
+            result = self.client[self.db_name][collection].update_one(criteria, params) 
+            if result.matched_count == 0:
+                return "Nothing was updated"
+            else:
+                return f"Update operation was successful ({result.matched_count})"
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
 
 
 class RedisDbConnection(AbstractDbConnector):
@@ -169,31 +196,49 @@ class RedisDbConnection(AbstractDbConnector):
 
 
     def insert(self, params, key):
-        self.__check_connection_to_db()
-        if self.client.exists(key) > 0:
-            return("This document already has this data")
-        else:
-            result = self.client.hmset(key, params)
-            return result  # True
+        try:
+            if self.client.exists(key) > 0:
+                return("This document already has this data")
+            else:
+                result = self.client.hmset(key, params)
+                return result  
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
 
 
     def get(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client.hgetall(criteria)
-        if not result:
-            message = "Nothing was found"
-            return message
-        return result
-
+        try:
+            result = []
+            for key in self.client.keys(criteria):
+                result.append(self.client.hgetall(key))
+            if not result:
+                message = "Nothing was found"
+                return message
+            else:
+                return result
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
         
-    def delete(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client.delete(criteria)
-        if result == 0:
-            message = "Nothing was deleted"
-            return message
-        return "Delete operation was successful"
 
+    def delete(self, criteria):
+        try:
+            deletes = 0
+            for key in self.client.keys(criteria):
+                self.client.delete(key)
+                deletes += 1
+            if deletes == 0:
+                message = "Nothing was deleted"
+                return message
+            else: 
+                return "Delete operation was successful"
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
             
     def update(self, criteria, params):
         """Here we can remove this method.

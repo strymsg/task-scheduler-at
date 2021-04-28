@@ -9,9 +9,27 @@ import json
 data = {
    "stock": "Brent Crude Futures",
    "qty": 250,
-   "type": "buy-limit",
+   "type": "sell-limit",
    "limit": 48.90,
    "client": "Crude Traders Inc."
+   }
+
+data1 = {
+   "stock": "Brent Crude Futures",
+   "qty": 5555,
+   "type": "buy-limit"
+   }
+
+data2 = {
+   "stock": "Brent Crude Futures",
+   "qty": 6666,
+   "type": "buy-limit"
+   }
+
+data3 = {
+   "stock": "Brent Crude Futures",
+   "qty": 7777,
+   "type": "buy-limit"
    }
 
 # Connection and queries to MongoDB:
@@ -27,11 +45,18 @@ mongo_client.connect()
 config1 = ConfigDbTask(query={},db_connection=mongo_client)
 db_task = DbTask(priority=0, config=config1)
 
-print(db_task.config.db_connection.insert(data))
+print(db_task.config.db_connection.insert("config-task",data1))
+print(db_task.config.db_connection.insert("config-task",data2))
+print(db_task.config.db_connection.insert("config-task",data3))
+print(db_task.config.db_connection.insert("config-task",data))
 
-print(db_task.config.db_connection.get({"limit": {"$eq":48.90}}))
-# print(db_task.config.db_connection.delete({"limit": 48.90}))
-print(db_task.config.db_connection.update({"limit": {"$eq":48.90}}, {"$set":{"limit":80}}))
+print(db_task.config.db_connection.get("config-task",{"type": {"$eq":"buy-limit"}}))
+
+print(db_task.config.db_connection.delete("config-task",{"type": {"$eq":"buy-limit"}}))
+
+print(db_task.config.db_connection.get("config-task",{"type": {"$eq":"buy-limit"}}))
+
+print(db_task.config.db_connection.update("config-task", {"type": {"$eq":"sell-limit"}}, {"$set":{"limit":1}}))
 
 mongo_client_2 = MongoDbConnection(db_name="dbtest2", 
                         db_host="localhost", 
@@ -41,14 +66,7 @@ mongo_client_2 = MongoDbConnection(db_name="dbtest2",
 mongo_client_2.connect()
 config2 = ConfigDbTask(query={},db_connection=mongo_client_2)
 db_task2 = DbTask(priority=0, config=config2)
-print(db_task2.config.db_connection.insert(data))
-
-# mongo_client4 = MongoDbConnection(
-#                         db_name="dbtest1", 
-#                         db_host="localhost", 
-#                         username=None, 
-#                         password=None, 
-#                         port=27017)
+print(db_task2.config.db_connection.insert("api-task",data))
 
 # ------------------------------------------------------------
 
@@ -65,12 +83,19 @@ print(db_task2.config.db_connection.insert(data))
 # config1 = ConfigDbTask(query={},db_connection=redis_client)
 # db_task = DbTask(priority=0, config=config1)
 
-# r = db_task.config.db_connection.insert(data, "DATA1")
-# print(r)
-# r = db_task.config.db_connection.get("DATA1")
-# print(r)
-# r = db_task.config.db_connection.delete("DATA1")
-# print(r)
+# print(db_task.config.db_connection.insert(data, "config-1"))
+
+# print(db_task.config.db_connection.insert(data1, "config-2"))
+
+# print(db_task.config.db_connection.insert(data2, "config-3"))
+
+# print(db_task.config.db_connection.insert(data3, "api-1"))
+
+# print(db_task.config.db_connection.get("config-*"))
+
+# print(db_task.config.db_connection.delete("config-*"))
+
+# print(db_task.config.db_connection.get("*"))
 
 # redis_client2 = RedisDbConnection(
 #                         db_name="1", 
