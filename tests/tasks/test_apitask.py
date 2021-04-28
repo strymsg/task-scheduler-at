@@ -41,6 +41,9 @@ def config_api_delete():
 @pytest.fixture
 def api_task(config_api_get):
     apitask = ApiRequestTask(0, config=config_api_get)
+    assert apitask.task_id.split('_')[0] == 'task'
+    assert apitask.task_id.split('_')[1] == 'Api-request'
+    assert len(apitask.task_id.split('_')[2]) == 36
     assert apitask.task_id != ''
     #print('id:', apitask.task_id)
     return apitask
