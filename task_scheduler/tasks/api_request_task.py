@@ -69,13 +69,13 @@ class ApiRequestTask(AbstractTask):
             print(f'HTTPError: {http_err}')
             raise http_err
         except RequestException as request_err:
-            print(f'HTTPError: {request_err}')
+            print(f'RequestException: {request_err}')
             raise request_err
         except ConnectionError as conn_err:
-            print(f'HTTPError: {conn_err}')
+            print(f'ConnectionError: {conn_err}')
             raise conn_err
         except URLRequired as url_err: 
-            print(f'HTTPError: {url_err}')
+            print(f'URLRequired: {url_err}')
             raise url_err
 
     def execute(self):
