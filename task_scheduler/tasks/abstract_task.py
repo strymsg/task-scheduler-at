@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from abc import abstractmethod
+from task_scheduler.utils.logger import CustomLogger
 
 class AbstractTask:
     def __init__(self, priority=0, type=''):
@@ -20,6 +21,9 @@ class AbstractTask:
         self._task_id = \
             f'task_{type}_{uuid.uuid4()}'
 
+        self.logger = CustomLogger(__name__)
+        print("LOGGER", self.logger)
+        self.logger.info(f"abstract task.... {self._task_id}")
     @property
     def task_id(self):
         return self._task_id
