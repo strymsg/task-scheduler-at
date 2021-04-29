@@ -108,5 +108,9 @@ venv.bak/
 # VSCode
 .vscode/
 
+# configuration files
+task_scheduler/configs/config.dev.json
+task_scheduler/configs/config.prod.json
+
 # private notes
 *.priv
