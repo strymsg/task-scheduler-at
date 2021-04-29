@@ -3,7 +3,8 @@
     "name": "task_scheduler",
     "username": "",
     "password": "",
-    "port": 27017
+    "port": 27017,
   },
-  "loglevel": "DEBUG"
+  "loglevel": "DEBUG",
+  "secret_key": "some secret!!!"
 }
