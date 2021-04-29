@@ -13,10 +13,15 @@ virtualenv --python=python3
 pip install -r requirements.txt
 pip install -r requirements.dev.txt
 ```
+Setup and the application
+```
+export FLASK_APP=task-scheduler
+export FLASK_ENV=development
+
+# run the flask server
+flask run
+```
 
 ## Class diagram
-## TEST1
 
 [XML](docs/task-manager.xml)
-
-![diagram](docs/task-manager.jpg)
