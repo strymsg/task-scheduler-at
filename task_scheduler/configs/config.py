@@ -12,11 +12,11 @@ class Configuration:
     '''
     def __init__(self):
         self.configuration = {}
-        filename = ''
+        filename = os.path.join(os.path.abspath(os.path.dirname(__file__)))
         if os.environ.get('FLASK_ENV') == 'development':
-            filename = 'task_scheduler/configs/config.dev.json'
+            filename = os.path.join(filename, 'config.dev.json')
         else:
-            filename = 'task_scheduler/configs/config.prod.json'
+            filename = os.path.join(filename, 'config.prod.json')
 
         with open(filename) as jsonfile:
             try:

@@ -2,8 +2,10 @@ import logging
 
 
 class CustomLogger(logging.Logger):
-    # Custom Logger should be created when having an app taht has many modules
-    # or your app uses part time modules
+    '''
+    Custom logger should be created when having an app that has many modules
+    or your app uses part time modules
+    '''
     open = False
     handlers = []
 
