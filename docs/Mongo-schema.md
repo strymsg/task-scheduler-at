@@ -6,17 +6,19 @@ Proposed schema:
 Scheduler{
   ref: Tasks {
     ref: configs {
-	  {schedule}
     }
 	ref: task_result {
+	}
+    ref: {
+	  schedule_entry
 	}
   }
 }
 ```
-  - An Scheduler object contains a **reference** to every task
-  - A task has a **reference** to a config (there exists 3 types of configs)
-  - A config **embbeds** a schedule.
-  - A task **reference** to a task result
+  - A Scheduler object contains **references** to every task.
+  - A task has a **reference** to a config (there exists 3 types of configs).
+  - A task **references** a schedule_entry.
+  - A task **references** to a task result.
 
 ## Documents
 
@@ -29,8 +31,9 @@ Scheduler{
   "creation_time": "04/27/2021 13:35:35",
   "priority": 0,
   "type": "Api-request",
-  "configs": [ObjectID("config_1"), ObjectID("config_2")],
-  "task_results": [ObjectID("taskResult_1"), ObjectID("taskResult_2")]
+  "configs": ObjectID("config_1"),
+  "task_results": [ObjectID("taskResult_1"), ObjectID("taskResult_2")],
+  "schedule_entry": ObjectID("schedule-entry_1")
 }
 ```
 ### Config
@@ -53,12 +56,7 @@ For Api-request
      "Quantity": 1,
      "Price": 18.00      
   },
-  "api_token": "",
-  "schedule": {
-    "type": "periodic",
-    "every": 15,
-    "unit": "minutes"
-  }
+  "api_token": ""
 }
 
 ```
@@ -77,11 +75,6 @@ For Db
     "password": "",
     "username": "",
     "db_host": "localhost"
-  },
-  "schedule": {
-    "type": "periodic",
-    "every": 12,
-    "unit": "hours"
   }
 }
 ```
@@ -96,11 +89,25 @@ For file
   "file_operation": "write",
   "file_content": "probando contenido...",
   "file_encoding": "utf-8"
-  },
-  "schedule": {
-    "type": "specific",
-    "time": "04/26/2021 16:00:00"
-  }
+}
+```
+
+### ScheduleEntry
+
+```json
+{
+  "schedule_id": "schedule-entry_fd396cc3-3cf6-4e29-af6b-9e48eabffd6b",
+  "type": "specific",
+  "time": "04/26/2021 16:00:00"
+}
+```
+
+```json
+{
+  "schedule_id": "schedule-entry_ca11a7c3-5432-477e-99a2-976290ed762b",
+  "type": "periodic",
+  "every": 15,
+  "unit": "minutes"
 }
 ```
 
@@ -109,8 +116,8 @@ For file
 ```json
 {
   "task_result_id": "task-result_1234bc71-e29d-89aa-3db1-90c273b7919b",
-  "last_execution": "04/27/2021 14:00:00",
-  "time": "04/27/2021 14:00:00",
+  "runBy": "user",
+  "time": "04/27/2021 14:00:00",d
   "error_message": "",
   "result": "status_code: 200"
 }
