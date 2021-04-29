@@ -7,7 +7,7 @@ class DbTask(AbstractTask):
         :param priority: from 0 (most important) to any greater integer
         :param config(ConfigDbTask): Configuration parameters
         '''
-        super().__init__(priority, type='Db-task')
+        super().__init__(priority, type='Db')
         self.config = config
 
     def request_to_db(self):

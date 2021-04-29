@@ -7,7 +7,7 @@ class FileTask(AbstractTask):
         :param priority: from 0 (most important) to any greater integer
         :param config(ConfigFileTask): Configuration parameters
         '''
-        super().__init__(priority, type='File-task')
+        super().__init__(priority, type='File')
         self.config = config
 
     def read_file(self):
