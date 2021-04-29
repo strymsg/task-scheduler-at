@@ -22,8 +22,8 @@ class AbstractTask:
             f'task_{type}_{uuid.uuid4()}'
 
         self.logger = CustomLogger(__name__)
-        print("LOGGER", self.logger)
-        self.logger.info(f"abstract task.... {self._task_id}")
+        #print("LOGGER", self.logger)
+        self.logger.info(f"{self._task_id}")
     @property
     def task_id(self):
         return self._task_id

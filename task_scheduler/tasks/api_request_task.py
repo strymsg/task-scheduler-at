@@ -6,6 +6,7 @@ from json import JSONDecodeError
 
 from task_scheduler.tasks.abstract_task import AbstractTask
 from task_scheduler.tasks.config_objects import ConfigApiRequestTask
+from task_scheduler.utils.logger import CustomLogger
 
 class ApiRequestTask(AbstractTask):
     def __init__(self, priority, config:ConfigApiRequestTask):
@@ -15,6 +16,7 @@ class ApiRequestTask(AbstractTask):
         '''
         super().__init__(priority, type='Api-request')
         self.config = config
+        self.logger = CustomLogger(__name__)
 
     def do_request(self):
         '''Do api request using requests library using config object
@@ -63,19 +65,21 @@ class ApiRequestTask(AbstractTask):
                 'headers': response.headers,
                 'url': response.url
             }
+            #self.logger.debug("Api-request executed")
+            #self.logger.debug(res_dict)
             return res_dict
         # TODO: Log all exceptions
         except HTTPError as http_err:
-            print(f'HTTPError: {http_err}')
+            self.logger.info(f'HTTPError: {http_err}')
             raise http_err
         except RequestException as request_err:
-            print(f'RequestException: {request_err}')
+            self.logger.info(f'RequestException: {request_err}')
             raise request_err
         except ConnectionError as conn_err:
-            print(f'ConnectionError: {conn_err}')
+            self.logger.info(f'ConnectionError: {conn_err}')
             raise conn_err
         except URLRequired as url_err: 
-            print(f'URLRequired: {url_err}')
+            self.logger.info(f'URLRequired: {url_err}')
             raise url_err
 
     def execute(self):
