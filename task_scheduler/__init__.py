@@ -20,6 +20,7 @@ def create_app(test_config=None):
     config_obj = Configuration()
 
     logger = config_logger(config_obj.configuration)
+    #logger.info(f'Configurations loaded {config_obj.configuration}')
     logger.info("logging info test")
     logger.error("logging Error test")
     logger.debug("logging debug test")

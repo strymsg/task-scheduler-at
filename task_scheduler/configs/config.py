@@ -16,9 +16,9 @@ class Configuration:
         if os.environ.get('FLASK_ENV') == 'development':
             filename = 'task_scheduler/configs/config.dev.json'
         else:
-            filename = 'task_scheduler/configs/config.json'
+            filename = 'task_scheduler/configs/config.prod.json'
 
-        with open("task_scheduler/configs/config.dev.json") as jsonfile:
+        with open(filename) as jsonfile:
             try:
                 d = json.loads(jsonfile.read())
                 self.configuration = d
