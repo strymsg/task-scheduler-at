@@ -13,6 +13,14 @@ virtualenv --python=python3
 pip install -r requirements.txt
 pip install -r requirements.dev.txt
 ```
+Setup and the application
+```
+export FLASK_APP=task-scheduler
+export FLASK_ENV=development
+
+# run the flask server
+flask run
+```
 
 ## Class diagram
 
@@ -23,3 +31,4 @@ pip install -r requirements.dev.txt
 ## mongo db schema
 
 The app main database uses mongo. See [docs/Mongo-schema.md](docs/Mongo-schema.md)
+
