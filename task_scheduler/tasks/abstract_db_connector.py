@@ -3,9 +3,39 @@ from pymongo import MongoClient
 from redis import Redis
 from pymongo.errors import ServerSelectionTimeoutError, \
     AutoReconnect, ConnectionFailure, ConfigurationError, OperationFailure
-from redis.exceptions import ConnectionError 
-
+from redis.exceptions import ConnectionError, TimeoutError, RedisError
+ 
 class AbstractDbConnector:
+    """
+    Abstract class used to defind databases connections behaviour
+
+    ...
+    Attributes
+    ----------
+    db_name : str
+        name used to connect to a specific database
+    db_host : str
+        the localhost used to connect to the database
+    username : str
+        the username credential used to access to the database
+    password : str
+        the password credential used to access to the database
+    port : int
+        port to which it will connect to the database
+
+    Methods
+    -------
+    connect():
+        Tries to connect to the DB and returns a response
+    insert():
+        Inserts a given data in a specific table into the DB.
+    get():
+        Inserts a given data in a specific table into the DB.
+    delete():
+        Deletes a given data in a specific table into the DB.
+    update():
+        Updates a given data in a specific table into the DB.
+    """
     def __init__(
             self, 
             db_name:str, 
@@ -13,35 +43,70 @@ class AbstractDbConnector:
             username:str,
             password:str, 
             port:int):
-
+ 
         self.db_name = db_name
         self.db_host = db_host
         self.username = username
         self.password = password
         self.port = port
-
+ 
     @abstractmethod
     def connect(self):
         pass
-
+ 
     @abstractmethod
     def insert(self, params):
         pass
 
     @abstractmethod
+    def get(self, params):
+        pass
+ 
+    @abstractmethod
     def delete(self, params):
         pass
-
+ 
     @abstractmethod
     def update(self, params):
         pass
-
-
+ 
+ 
 class MongoDbConnection(AbstractDbConnector):
+    """
+    Class used to defind all the requested operations to Mongo DB
 
+    ...
+    Attributes
+    ----------
+    db_name : str
+        name used to connect to a specific database
+    db_host : str
+        the localhost used to connect to the database
+    username : str
+        the username credential used to access to the database
+    password : str
+        the password credential used to access to the database
+    port : int
+        port to which it will connect to the database
+
+    Methods
+    -------
+    __check_connection_to_db():
+        Verifies the connection to the DB. 
+    connect():
+        Tries to connect to the DB and returns a response
+    insert():
+        Inserts a given data in a specific "collection" into the DB.
+    get():
+        Inserts a given data in a specific "collection", acoording to a specific "criteria".
+    delete():
+        Deletes a given data in a specific "collection", acoording to a specific "criteria".
+    update():
+        Updates a given data in a specific "collection", acoording to a specific "criteria".
+    """
     __number_of_connections = 0
     __connections = {}
-
+ 
     def __init__(
             self, 
             db_name:str, 
@@ -52,7 +117,7 @@ class MongoDbConnection(AbstractDbConnector):
         """ Constructor.
         """
         super().__init__(db_name, db_host, username, password, port)
-
+ 
         for num_connection, config in MongoDbConnection.__connections.items():
             if config["db_name"] == db_name and config["db_host"] == db_host \
                 and config["username"] == username and config["password"] == password \
@@ -68,7 +133,7 @@ class MongoDbConnection(AbstractDbConnector):
                 "password" : password,
                 "port" : port
             }
-
+ 
     def connect(self):
         self.client = MongoClient(
                     host=self.db_host, 
@@ -77,50 +142,103 @@ class MongoDbConnection(AbstractDbConnector):
                     password=self.password)
         response = self.__check_connection_to_db()  
         return response
-
-
+ 
     def __check_connection_to_db(self):
         try:
             aux = self.client[self.db_name].command("ping")
             return "Connection Establish" 
         except ServerSelectionTimeoutError as err:
             raise(err)
-
-    
-    def insert(self, params):
-        self.__check_connection_to_db()
-        if self.client[self.db_name].collection1.count_documents(params, limit = 1):
-            return("This document already has this data") 
-        else:
-            result = self.client[self.db_name].collection1.insert_many([params])
-            return result.acknowledged
-
-
-    def get(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.find(criteria)
-        for collection in result:
-            collection.pop("_id")
-        return(collection)
-
-
-    def delete(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.delete_one(criteria) 
-        return(result.deleted_count)
-
+ 
+    def insert(self, collection, params):
+        try:
+            if self.client[self.db_name][collection].count_documents(params, limit = 1):
+                return("This document already has this data") 
+            else:
+                result = self.client[self.db_name][collection].insert_one(params)
+                return result.acknowledged
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
+ 
+    def get(self, collection, criteria):
+        try:
+            result = []
+            for collect in self.client[self.db_name][collection].find(criteria):
+                collect.pop("_id")
+                result.append(collect)
+            if not result:
+                message = "Nothing was found"
+                return message
+            else:
+                return result
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
+ 
+    def delete(self, collection, criteria):
+        try:
+            result = self.client[self.db_name][collection].delete_many(criteria) 
+            if result.deleted_count == 0:
+                return "Nothing was deleted"
+            else:
+                return f"Delete operation was successful ({result.deleted_count})"
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
             
-    def update(self, criteria, params):
-        self.__check_connection_to_db()
-        result = self.client[self.db_name].collection1.update_one(criteria, params) 
-        return(result.matched_count)
-
-
+    def update(self, collection, criteria, params):
+        try:
+            result = self.client[self.db_name][collection].update_one(criteria, params) 
+            if result.matched_count == 0:
+                return "Nothing was updated"
+            else:
+                return f"Update operation was successful ({result.matched_count})"
+        except OperationFailure as err:
+            raise err
+        finally:
+            self.client.close()
+ 
+ 
 class RedisDbConnection(AbstractDbConnector):
+    """
+    Class used to defind all the requested operations to Redis DB
 
+    ...
+    Attributes
+    ----------
+    db_name : str
+        name used to connect to a specific database
+    db_host : str
+        the localhost used to connect to the database
+    username : str
+        the username credential used to access to the database
+    password : str
+        the password credential used to access to the database
+    port : int
+        port to which it will connect to the database
+
+    Methods
+    -------
+    __check_connection_to_db():
+        Verifies the connection to the DB. 
+    connect():
+        Tries to connect to the DB and returns a response
+    insert():
+        Inserts a given data in a specific "key" into the DB.
+    get():
+        Gets data from the DB, acoording to a specific "criteria".
+    delete():
+        Deletes data in the DB, acoording to a specific "criteria".
+    update():
+        Updates a given data in the DB, acoording to a specific "criteria".
+    """ 
     __number_of_connections = 0
     __connections = {}
-
+ 
     def __init__(
             self, 
             db_name:str, 
@@ -131,23 +249,26 @@ class RedisDbConnection(AbstractDbConnector):
         """ Constructor.
         """
         super().__init__(db_name, db_host, username, password, port)
-
+        instance = None
         for num_connection, config in RedisDbConnection.__connections.items():
             if config["db_name"] == db_name and config["db_host"] == db_host \
                 and config["username"] == username and config["password"] == password \
                 and config["port"] == port:
                 
-                raise Exception("You can't create another RedisDbConnection class")
-        RedisDbConnection.__number_of_connections +=1
-        RedisDbConnection.__connections[RedisDbConnection.__number_of_connections] \
-            = {
-                "db_name" : db_name,
-                "db_host" : db_host,
-                "username" : username,
-                "password" : password,
-                "port" : port
-            }
-
+                instance = config["instance"]
+                
+        if not instance:
+            RedisDbConnection.__number_of_connections +=1
+            RedisDbConnection.__connections[RedisDbConnection.__number_of_connections] \
+                = {
+                    "db_name" : db_name,
+                    "db_host" : db_host,
+                    "username" : username,
+                    "password" : password,
+                    "port" : port,
+                    "instance": self
+                }
+ 
     def connect(self):
         self.client = Redis(
                         host=self.db_host, 
@@ -158,42 +279,56 @@ class RedisDbConnection(AbstractDbConnector):
                         decode_responses=True)
         response = self.__check_connection_to_db()  
         return response
-
-
+ 
     def __check_connection_to_db(self):
         try:
             self.client.ping()
             return "Connection Establish"
         except ConnectionError as err:
             raise(err)
-
-
+ 
     def insert(self, params, key):
-        self.__check_connection_to_db()
-        if self.client.exists(key) > 0:
-            return("This document already has this data")
-        else:
-            result = self.client.hmset(key, params)
-            return result  # True
-
-
+        try:
+            if self.client.exists(key) > 0:
+                return("This document already has this data")
+            else:
+                result = self.client.hmset(key, params)
+                return result  
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
+ 
     def get(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client.hgetall(criteria)
-        if not result:
-            message = "Nothing was found"
-            return message
-        return result
-
-        
+        try:
+            result = []
+            for key in self.client.keys(criteria):
+                result.append(self.client.hgetall(key))
+            if not result:
+                message = "Nothing was found"
+                return message
+            else:
+                return result
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
+ 
     def delete(self, criteria):
-        self.__check_connection_to_db()
-        result = self.client.delete(criteria)
-        if result == 0:
-            message = "Nothing was deleted"
-            return message
-        return "Delete operation was successful"
-
+        try:
+            deletes = 0
+            for key in self.client.keys(criteria):
+                self.client.delete(key)
+                deletes += 1
+            if deletes == 0:
+                message = "Nothing was deleted"
+                return message
+            else: 
+                return "Delete operation was successful"
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
             
     def update(self, criteria, params):
         """Here we can remove this method.

@@ -44,22 +44,22 @@ class TestMongoDbConnection(TestCase):
       
     def test_multiple_connection(self):
         for instance, _ in enumerate(cases):
-            self.assertEqual(cases[instance].connect(),"Connection Establish")
+            self.assertEqual(cases[instance].connect(), "Connection Establish")
 
     def test_single_connection(self):
-        self.assertEqual(case_single_connection.connect(),"Connection Establish")
+        self.assertEqual(case_single_connection.connect(), "Connection Establish")
 
     def test_insert_data_already_stored(self):
         case_single_connection.connect()
-        case_single_connection.insert(data)
+        case_single_connection.insert("config-task", data)
         expected = "This document already has this data"
-        self.assertEqual(case_single_connection.insert(data), expected)
-        case_single_connection.delete({"qty":510})
+        self.assertEqual(case_single_connection.insert("config-task",data), expected)
+        case_single_connection.delete("config-task", {"qty":510})
 
     def test_insert_new_data(self):
         case_single_connection.connect()
-        self.assertEqual(case_single_connection.insert(new_data),True)
-        case_single_connection.delete({"qty":910})
+        self.assertEqual(case_single_connection.insert("config-task", new_data), True)
+        case_single_connection.delete("config-task", {"qty":910})
 
     def test_get_data(self):
         expected = {
@@ -70,23 +70,24 @@ class TestMongoDbConnection(TestCase):
             "client": "Crude Traders Inc."
             }
         case_single_connection.connect()
-        case_single_connection.insert(data)
+        case_single_connection.insert("config-task", data)
         query = {"limit": {"$eq":48.90}}
-        self.assertEqual(case_single_connection.get(query),expected)
+        self.assertEqual(case_single_connection.get("config-task", query)[0], expected)
 
     def test_delete_data(self):
         case_single_connection.connect()
-        case_single_connection.insert(data)
+        case_single_connection.insert("config-task", data)
         query = {"qty":510}
-        self.assertEqual(case_single_connection.delete(query),1)
+        self.assertEqual(case_single_connection.delete("config-task", query), "Delete operation was successful (1)")
 
     def test_update_data(self):
         case_single_connection.connect()
-        case_single_connection.insert(data)
+        case_single_connection.insert("config-task", data)
         query = {"limit": {"$eq":48.90}}
         field = {"$set":{"limit":50}}
-        self.assertEqual(case_single_connection.update(query,field),1)
-        case_single_connection.delete({"limit":50})
+        self.assertEqual(case_single_connection.update("config-task", query, field), \
+            "Update operation was successful (1)")
+        case_single_connection.delete("config-task", {"limit":50})
 
 if __name__ == "__main__":
     unittest.main()
