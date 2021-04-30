@@ -166,7 +166,7 @@ class MongoDbConnection(AbstractDbConnector):
         try:
             result = []
             for collect in self.client[self.db_name][collection].find(criteria):
-                collect.pop("_id")
+                # collect.pop("_id")
                 result.append(collect)
             if not result:
                 message = "Nothing was found"
