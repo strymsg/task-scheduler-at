@@ -1,8 +1,7 @@
 """
 Task Manager and Scheduler
 """
-
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 import os
 import logging
 from flask import Flask
@@ -24,9 +23,6 @@ def create_app(test_config=None):
         SECRET_KEY=config_obj.get_config_var('secret_key'),
     )
     logger.info("INITIALIZED TASK SCHEDULER APP")
-
-    # importing endpoints
-    from task_scheduler.tasks.endpoints import api_request_task
 
     return app
 
