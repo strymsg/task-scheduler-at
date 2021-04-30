@@ -1,10 +1,7 @@
 from task_scheduler.tasks.db_task import DbTask
 from task_scheduler.tasks.config_objects import ConfigDbTask
-from pymongo import MongoClient
-from redis import Redis
-from pprint import pprint
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection, RedisDbConnection
-import json
+
 
 data = {
    "stock": "Brent Crude Futures",
@@ -32,7 +29,7 @@ data3 = {
    "type": "buy-limit"
    }
 
-# Connection and queries to MongoDB:
+print("\nConnection and queries to MongoDB:\n=================================\n")
 
 mongo_client = MongoDbConnection(
                         db_name="dbtest1", 
@@ -70,37 +67,63 @@ print(db_task2.config.db_connection.insert("api-task",data))
 
 # ------------------------------------------------------------
 
-# Connection and queries to RedisDB:
-# 
-# redis_client = RedisDbConnection(
-#                         db_name="0", 
-#                         db_host="localhost", 
-#                         username=None, 
-#                         password=None, 
-#                         port=6379)
+print("\nConnection and queries to RedisDB:\n==================================\n") 
 
-# redis_client.connect()
-# config1 = ConfigDbTask(query={},db_connection=redis_client)
-# db_task = DbTask(priority=0, config=config1)
+data = {
+   "stock": "Brent Crude Futures",
+   "qty": 250,
+   "type": "sell-limit",
+   "limit": 48.90,
+   "client": "Crude Traders Inc."
+   }
 
-# print(db_task.config.db_connection.insert(data, "config-1"))
+data1 = {
+   "stock": "Brent Crude Futures",
+   "qty": 5555,
+   "type": "buy-limit"
+   }
 
-# print(db_task.config.db_connection.insert(data1, "config-2"))
+data2 = {
+   "stock": "Brent Crude Futures",
+   "qty": 6666,
+   "type": "buy-limit"
+   }
 
-# print(db_task.config.db_connection.insert(data2, "config-3"))
+data3 = {
+   "stock": "Brent Crude Futures",
+   "qty": 7777,
+   "type": "buy-limit"
+   }
 
-# print(db_task.config.db_connection.insert(data3, "api-1"))
+redis_client = RedisDbConnection(
+                        db_name="0", 
+                        db_host="localhost", 
+                        username=None, 
+                        password=None, 
+                        port=6379)
 
-# print(db_task.config.db_connection.get("config-*"))
+redis_client.connect()
+config1 = ConfigDbTask(query={},db_connection=redis_client)
+db_task = DbTask(priority=0, config=config1)
 
-# print(db_task.config.db_connection.delete("config-*"))
+print(db_task.config.db_connection.insert(data, "config-1"))
 
-# print(db_task.config.db_connection.get("*"))
+print(db_task.config.db_connection.insert(data1, "config-2"))
 
-# redis_client2 = RedisDbConnection(
-#                         db_name="1", 
-#                         db_host="localhost", 
-#                         username=None, 
-#                         password=None, 
-#                         port=6379)
-# redis_client2.connect()
+print(db_task.config.db_connection.insert(data2, "config-3"))
+
+print(db_task.config.db_connection.insert(data3, "api-1"))
+
+print(db_task.config.db_connection.get("config-*"))
+
+print(db_task.config.db_connection.delete("config-*"))
+
+print(db_task.config.db_connection.get("*"))
+
+redis_client2 = RedisDbConnection(
+                        db_name="1", 
+                        db_host="localhost", 
+                        username=None, 
+                        password=None, 
+                        port=6379)
+redis_client2.connect()
