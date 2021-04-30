@@ -1,5 +1,5 @@
-from abstract_task import AbstractTask
-from config_objects import ConfigDbTask
+from task_scheduler.tasks.abstract_task import AbstractTask
+from task_scheduler.tasks.config_objects import ConfigDbTask
 
 class DbTask(AbstractTask):
     def __init__(self, priority, config:ConfigDbTask):

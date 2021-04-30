@@ -44,16 +44,29 @@ class ConfigDbTask(ConfigObject):
             'query': query
         })
 
+# class ConfigFileTask(ConfigObject):
+#     def __init__(self, location,
+#                  file_content='', file_encoding='utf-8', type='read'):
+#         self.location = location
+#         self.file_content = file_content
+#         self.file_encoding = file_encoding
+#         self.type = type
+#         super().__init__({
+#             'location': location,
+#             'file_content': file_content,
+#             'file_encoding': file_encoding,
+#             'type': type
+#         })
+
 class ConfigFileTask(ConfigObject):
-    def __init__(self, location,
-                 file_content='', file_encoding='utf-8', type='read'):
-        self.location = location
-        self.file_content = file_content
-        self.file_encoding = file_encoding
-        self.type = type
-        super().__init__({
-            'location': location,
-            'file_content': file_content,
-            'file_encoding': file_encoding,
-            'type': type
-        })
+    def __init__(self, args={}):
+        self.location = args["location"]
+        self.file_content = args["file_content"]
+        self.file_encoding = args["file_encoding"]
+        self.type = args["type"]
+        # super().__init__({
+        #     'location': location,
+        #     'file_content': file_content,
+        #     'file_encoding': file_encoding,
+        #     'type': type
+        # })
