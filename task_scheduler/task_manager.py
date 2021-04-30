@@ -7,7 +7,28 @@ from task_scheduler.tasks.file_task import FileTask
 from bson.objectid import ObjectId
 
 class TaskManager:
+    """
+    Class used to execute a specific task with its configuration through the 
+    RunTask endpoint request.
 
+    ...
+    Attributes
+    ----------
+    params : dict
+    params[type_task]: str 
+        it is the type of the task e.g. "Api-request" or "Db" or "File" to be searched for
+    params[configuration_id]: str
+        it is the ID of the configuration to be searched for
+    db_connetion: MongoDbConnection
+        the connection has to be passed to the Mongo DB
+
+    Methods
+    -------
+    execute():
+        Executes the task with its configuration 
+    instantiate():
+        Initializes the configuration object and the task object to be executed
+    """ 
     def __init__(self, params, db_connection: MongoDbConnection):
         self.type_task = params["type_task"]
         self.configuration_id = params["configuration_id"]

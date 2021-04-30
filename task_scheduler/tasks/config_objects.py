@@ -32,17 +32,28 @@ class ConfigApiRequestTask(ConfigObject):
 
 
 class ConfigDbTask(ConfigObject):
-    def __init__(self, query:str, db_connection:AbstractDbConnector):
-        self.db_connection = db_connection
-        self.query = query
+    def __init__(self, args={}):
+        self.query_type = args["query_type"]
+        self.query = args["query"]
+        self.connector = args["connector"]
+        self.db_connection = RedisDbConnection(
+                                db_name=self.connector["db_name"], 
+                                db_host=self.connector["db_host"], 
+                                username=self.connector["username"], 
+                                password=self.connector["password"], 
+                                port=self.connector["port"]
+                                )
         super().__init__({
-            'db_name': self.db_connection.db_name,
-            'db_host': self.db_connection.db_host,
-            'username': self.db_connection.username,
-            'password': self.db_connection.password,
-            'port': self.db_connection.port,
-            'query': query
-        })
+            'query_type': args["query_type"],
+            'query': args["query"],
+            'connector': {
+                'db_name':self.connector["db_name"], 
+                'db_host':self.connector["db_host"], 
+                'username':self.connector["username"], 
+                'password':self.connector["password"], 
+                'port':self.connector["port"]
+                }
+            })
 
 
 class ConfigFileTask(ConfigObject):
