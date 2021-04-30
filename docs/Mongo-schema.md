@@ -1,26 +1,52 @@
 # Mongo Schema
 
-Proposed schema:
-
 ```
 Scheduler{
-  ref: Tasks {
-    ref: configs {
-    }
-	ref: task_result {
-	}
-    ref: {
-	  schedule_entry
-	}
-  }
+    ref: [schedule_entry]
 }
+
+schedule_entry {
+    ref: task 
+}
+
+task {
+    ref: config
+    ref: task_result
+}
+
+config {
+}
+
+task_result {
+}
+
 ```
-  - A Scheduler object contains **references** to every task.
-  - A task has a **reference** to a config (there exists 3 types of configs).
-  - A task **references** a schedule_entry.
-  - A task **references** to a task result.
+  - A Scheduler object contains **references** to schedule_entry documents.
+  - A schedule_entry **references** to a task.  
+  - A task has a **reference** to a config (there exists 3 types of configs), and a task_result.
 
 ## Documents
+
+### ScheduleEntry
+
+```json
+{
+  "schedule_id": "schedule-entry_fd396cc3-3cf6-4e29-af6b-9e48eabffd6b",
+  "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad",
+  "type": "specific",
+  "time": "04/26/2021 16:00:00"
+}
+```
+
+```json
+{
+  "schedule_id": "schedule-entry_ca11a7c3-5432-477e-99a2-976290ed762b",
+  "task_id": "task_Api-request_90b6bd71-6941-1529-8ae1-437643ccb4cac",
+  "type": "periodic",
+  "every": 15,
+  "unit": "minutes"
+}
+```
 
 ### Task
 
@@ -31,9 +57,8 @@ Scheduler{
   "creation_time": "04/27/2021 13:35:35",
   "priority": 0,
   "type": "Api-request",
-  "configs": ObjectID("config_1"),
+  "config": ObjectID("config_1"),
   "task_results": [ObjectID("taskResult_1"), ObjectID("taskResult_2")],
-  "schedule_entry": ObjectID("schedule-entry_1")
 }
 ```
 ### Config
@@ -92,32 +117,13 @@ For file
 }
 ```
 
-### ScheduleEntry
-
-```json
-{
-  "schedule_id": "schedule-entry_fd396cc3-3cf6-4e29-af6b-9e48eabffd6b",
-  "type": "specific",
-  "time": "04/26/2021 16:00:00"
-}
-```
-
-```json
-{
-  "schedule_id": "schedule-entry_ca11a7c3-5432-477e-99a2-976290ed762b",
-  "type": "periodic",
-  "every": 15,
-  "unit": "minutes"
-}
-```
-
 ### TaskResult
 
 ```json
 {
   "task_result_id": "task-result_1234bc71-e29d-89aa-3db1-90c273b7919b",
   "runBy": "user",
-  "time": "04/27/2021 14:00:00",d
+  "time": "04/27/2021 14:00:00",
   "error_message": "",
   "result": "status_code: 200"
 }
@@ -129,22 +135,15 @@ All task documents will be embedding inside a **Scheduler** document:
 
 ```json
 {
-  "db_connection": {
-    "db_name": "task_scheduler",
-    "port": 21017,
-    "password": "",
-    "username": "",
-    "db_host": "localhost"
-  },
-  "tasks": {
+  "schedule_entries": {
     "ApiRequests": [
-      ObjectID("task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad")
+      ObjectID("schedule-entry_fd396cc3-3cf6-4e29-af6b-9e48eabffd6b")
     ],
     "Db": [
-      ObjectID("task_File_12f1bd71-f441-4519-8a41-44643ccb4def")
+      ObjectID("schedule-entry_ca11a7c3-5432-477e-99a2-976290ed762b")
     ],
     "File": [
-      ObjectID("task_Db_63f1bd88-f44c-2519-8a41-44643ccb4c4c")
+      ObjectID("schedule-entry_4b1d17c0-7326-592e-11c2-986290ed762b")
     ]
   }
 }
