@@ -15,8 +15,11 @@ pip install -r requirements.dev.txt
 ```
 
 ## Class diagram
-## TEST1
 
 [XML](docs/task-manager.xml)
 
 ![diagram](docs/task-manager.jpg)
+
+## mongo db schema
+
+The app main database uses mongo. See [docs/Mongo-schema.md](docs/Mongo-schema.md)
