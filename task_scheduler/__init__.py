@@ -25,4 +25,8 @@ def create_app(test_config=None):
     )
     logger.info("INITIALIZED TASK SCHEDULER APP")
 
+    # importing endpoints
+    from task_scheduler.tasks.endpoints import api_request_task
+
     return app
+
