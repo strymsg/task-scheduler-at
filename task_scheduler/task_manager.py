@@ -27,9 +27,19 @@ class TaskManager:
 
     def instantiate(self, task_args, config_args):
         if self.type_task == "Api-request":
-            pass
+            self.config = ConfigApiRequestTask(config_args)
+            self.task = ApiRequestTask(
+                            priority=task_args["priority"],
+                            config=self.config
+                            )
+
         elif self.type_task == "Db":
-            pass
+            self.config = ConfigDbTask(config_args)
+            self.task = DbTask(
+                            priority=task_args["priority"],
+                            config=self.config
+                            )
+
         elif self.type_task == "File":
             self.config = ConfigFileTask(config_args)
             self.task = FileTask(

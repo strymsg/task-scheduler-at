@@ -14,20 +14,20 @@ class ConfigObject:
     def config_id(self, value):
         self._config_id = value
 
+
 class ConfigApiRequestTask(ConfigObject):
-    def __init__(self,
-                 url, http_method='get', body={}, api_token='', headers={}):
-        self.url = url
-        self.http_method = http_method
-        self.body = body
-        self.api_token = api_token
-        self.headers = headers
+    def __init__(self, args={}):
+        self.url = args["url"]
+        self.http_method = args["http_method"]
+        self.body = args["body"]
+        self.api_token = args["api_token"]
+        self.headers = args["headers"]
         super().__init__({
-            'url': url,
-            'http_method': http_method,
-            'body': body,
-            'api_token': api_token,
-            'headers': headers
+            'url': args["url"],
+            'http_method': rgs["http_method"],
+            'body': args["body"],
+            'api_token': args["api_token"],
+            'headers': args["headers"]
         })
 
 
@@ -44,19 +44,6 @@ class ConfigDbTask(ConfigObject):
             'query': query
         })
 
-# class ConfigFileTask(ConfigObject):
-#     def __init__(self, location,
-#                  file_content='', file_encoding='utf-8', type='read'):
-#         self.location = location
-#         self.file_content = file_content
-#         self.file_encoding = file_encoding
-#         self.type = type
-#         super().__init__({
-#             'location': location,
-#             'file_content': file_content,
-#             'file_encoding': file_encoding,
-#             'type': type
-#         })
 
 class ConfigFileTask(ConfigObject):
     def __init__(self, args={}):
@@ -64,9 +51,9 @@ class ConfigFileTask(ConfigObject):
         self.file_content = args["file_content"]
         self.file_encoding = args["file_encoding"]
         self.type = args["type"]
-        # super().__init__({
-        #     'location': location,
-        #     'file_content': file_content,
-        #     'file_encoding': file_encoding,
-        #     'type': type
-        # })
+        super().__init__({
+            'location': args["location"],
+            'file_content': args["file_content"],
+            'file_encoding': args["file_encoding"],
+            'type': args["type"]
+        })

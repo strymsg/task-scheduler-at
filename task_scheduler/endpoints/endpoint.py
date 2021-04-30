@@ -20,9 +20,13 @@ app = Flask(__name__)
 api = Api(app)
 
 class RunTask(Resource):
+
+    # This verb "GET" is still here and is used to view all tasks
+    # that there are in the DB.
+    #
+    # But it will be removed later when the endpoints are finished
     def get(self):
-        data = connection_db_app.get("tasks",{})
-        
+        data = connection_db_app.get("tasks",{}) 
         return json.loads(json_util.dumps(data))
 
     def post(self):
