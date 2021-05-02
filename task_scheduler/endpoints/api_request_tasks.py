@@ -1,15 +1,15 @@
-#from task_scheduler.main import app
+# from task_scheduler.main import app
 from task_scheduler.utils.constants import API_ROUTES
-from flask import Blueprint
+from flask import Blueprint, request
 
 import json
 
 bp_tasks = Blueprint(
-    'endpoints',
+    'api_request_tasks',
     __name__,
     url_prefix=API_ROUTES["TASKS_ROOT"])
 
-#print('FLASK APPPPP', app)
+# print('FLASK APPPPP', app)
 
 # just for testing:
 tasks = [
@@ -62,12 +62,17 @@ tasks = [
     },
 ]
 
-@bp_tasks.route('/hola/', methods=['GET'])
+
+@bp_tasks.route('/hola/', methods=['GET',] )
 def hola():
-    return 'HOLA!'
+    if request.method == 'GET':
+        return 'HOLA!'
 
-@bp_tasks.route(API_ROUTES['TASKS'], methods=('GET'))
+
+@bp_tasks.route(API_ROUTES['TASKS'], methods=('GET', ))
 def show_tasks():
-    return ('Tasks:', json.dump(tasks))
+    if request.method == 'GET':
+        return json.dumps(tasks)
 
-#@app.route(API_ROUTES['TASK'] + )
+
+# @app.route(API_ROUTES['TASK'] + )
