@@ -1,6 +1,8 @@
 # from task_scheduler.main import app
-from task_scheduler.utils.constants import API_ROUTES
-from flask import Blueprint, request
+from task_scheduler.utils.constants import API_ROUTES, testing_tasks
+from flask import Blueprint, request, jsonify
+
+from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
 
 import json
 
@@ -11,59 +13,8 @@ bp_tasks = Blueprint(
 
 # print('FLASK APPPPP', app)
 
-# just for testing:
-tasks = [
-    {
-        "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad",
-        "creation_time": "04/27/2021 13:35:35",
-        "priority": 0,
-        "type": "Api-request",
-        "config": "config_1",
-        "task_results": ["taskResult_1"],
-        "config_id": "config_1521bd71-f491-89a3-7a41-4462ccb791ad",
-        "type": "Api-request",
-        "config": {
-            "config_id": "config_1521bd71-f491-89a3-7a41-4462ccb791ad",
-            "url": "https://reqbin.com/echo/post/json",
-            "http_method": "POST",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            "body": {
-                "Id": 78912,
-                "Customer": "Jason Sweet",
-                "Quantity": 1,
-                "Price": 18.00
-            },
-            "api_token": ""
-        }
-    },
-    {
-        "task_id": "task_Api-request_d782bd71-f441-4519-8a41-44643ccb4dad",
-        "creation_time": "04/27/2021 13:35:35",
-        "priority": 0,
-        "type": "Api-request",
-        "config": "config_1",
-        "task_results": ["taskResult_1"],
-        "config_id": "config_1390bd71-f491-89a3-7a41-4462ccb791ad",
-        "type": "Api-request",
-        "config": {
-            "config_id": "config_1390bd71-f491-89a3-7a41-4462ccb791ad",
-            "url": "https://api.github.com",
-            "http_method": "GET",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            "body": {},
-            "api_token": ""
-        }
-    },
-]
 
-
-@bp_tasks.route('/hola/', methods=['GET',] )
+@bp_tasks.route('/hola/', methods=['GET',])
 def hola():
     if request.method == 'GET':
         return 'HOLA!'
@@ -72,7 +23,47 @@ def hola():
 @bp_tasks.route(API_ROUTES['TASKS'], methods=('GET', ))
 def show_tasks():
     if request.method == 'GET':
-        return json.dumps(tasks)
+        return jsonify(testing_tasks)
 
 
-# @app.route(API_ROUTES['TASK'] + )
+@bp_tasks.route(API_ROUTES['TASK'] + '<string:task_id>', methods=('GET', ))
+def show_task(task_id):
+    if request.method == 'GET':
+        # temporary look for specific task
+        task = {}
+        for t in testing_tasks:
+            if t['task_id'] == task_id:
+                task = t
+                break
+        return jsonify(task)
+
+
+@bp_tasks.route(API_ROUTES['TASK_API_EXECUTE'], methods=('POST',))
+def exec_task():
+    if request.method == 'POST':
+        json_data = request.json
+        # TODO: verify mandatory fields
+        request_task = {
+            'url': json_data['url'],
+            'http_method': json_data['http_method'],
+            'headers': json_data['headers'],
+            'body': json_data['body'],
+            'api_token': json_data['api_token']
+        }
+
+        # creating task to execute
+        config = ConfigApiRequestTask(**request_task)
+        task = ApiRequestTask(0, config=config)
+
+        # executing the task
+        try:
+            resp = task.execute()
+            #print(resp)
+            print(resp['json'])
+            return resp['json']
+        except Exception as err:
+            print(f'Error executing task, {err}')
+            return str(err)
+
+
+#@bp_tasks.route(API_ROUTES['TASK'])
