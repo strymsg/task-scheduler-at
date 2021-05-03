@@ -13,8 +13,7 @@ bp_tasks = Blueprint(
 
 # print('FLASK APPPPP', app)
 
-
-@bp_tasks.route('/hola/', methods=['GET',])
+@bp_tasks.route('/hola/', methods=['GET', ])
 def hola():
     if request.method == 'GET':
         return 'HOLA!'
@@ -65,5 +64,33 @@ def exec_task():
             print(f'Error executing task, {err}')
             return str(err)
 
+@bp_tasks.route(API_ROUTES['TASK_API_ADD'], methods=('POST', ))
+def add_task():
+    if request.method == 'POST':
+        json_data = request.json
+        # TODO: verify mandatory fields
+        request_task = {
+            'url': json_data['url'],
+            'http_method': json_data['http_method'],
+            'headers': json_data['headers'],
+            'body': json_data['body'],
+            'api_token': json_data['api_token'],
+        }
+        schedule_entry = json_data.get('schedule_entry', {})
 
-#@bp_tasks.route(API_ROUTES['TASK'])
+        # creating task to add to the scheduler        config = ConfigApiRequestTask(**request_task)
+        print(schedule_entry)
+        config = ConfigApiRequestTask(**request_task)
+        task = ApiRequestTask(0, config=config)
+
+        # TODO: add schedule entry to the scheduler
+        # ...
+        # executing the task (just for testing)
+        try:
+            resp = task.execute()
+            #print(resp)
+            print(resp['json'])
+            return resp['json']
+        except Exception as err:
+            print(f'Error executing task, {err}')
+            return str(err)

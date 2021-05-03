@@ -12,7 +12,7 @@ API_ROUTES = {
 }
 
 # just for testing
-# just for testing:
+# just for testing (will be removed)
 testing_tasks = [
     {
         "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad",
