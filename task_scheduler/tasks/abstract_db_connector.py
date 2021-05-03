@@ -72,8 +72,7 @@ class AbstractDbConnector:
  
  
 class MongoDbConnection(AbstractDbConnector):
-    """
-    Class used to defind all the requested operations to Mongo DB
+    """Class used to defined all the requested operations to Mongo DB
 
     ...
     Attributes
@@ -98,7 +97,7 @@ class MongoDbConnection(AbstractDbConnector):
     insert():
         Inserts a given data in a specific "collection" into the DB.
     get():
-        Inserts a given data in a specific "collection", acoording to a specific "criteria".
+        Get a given data in a specific "collection", acoording to a specific "criteria".
     delete():
         Deletes a given data in a specific "collection", acoording to a specific "criteria".
     update():
@@ -166,7 +165,7 @@ class MongoDbConnection(AbstractDbConnector):
         try:
             result = []
             for collect in self.client[self.db_name][collection].find(criteria):
-                collect.pop("_id")
+                # collect.pop("_id")
                 result.append(collect)
             if not result:
                 message = "Nothing was found"
@@ -204,8 +203,7 @@ class MongoDbConnection(AbstractDbConnector):
  
  
 class RedisDbConnection(AbstractDbConnector):
-    """
-    Class used to defind all the requested operations to Redis DB
+    """Class used to defind all the requested operations to Redis DB
 
     ...
     Attributes
@@ -230,7 +228,7 @@ class RedisDbConnection(AbstractDbConnector):
     insert():
         Inserts a given data in a specific "key" into the DB.
     get():
-        Gets data from the DB, acoording to a specific "criteria".
+        Get data from the DB, acoording to a specific "criteria".
     delete():
         Deletes data in the DB, acoording to a specific "criteria".
     update():
@@ -303,7 +301,7 @@ class RedisDbConnection(AbstractDbConnector):
         try:
             result = []
             for key in self.client.keys(criteria):
-                result.append(self.client.hgetall(key))
+                result.append([key,self.client.hgetall(key)])
             if not result:
                 message = "Nothing was found"
                 return message
@@ -331,8 +329,19 @@ class RedisDbConnection(AbstractDbConnector):
             raise err
             
     def update(self, criteria, params):
-        """Here we can remove this method.
-        And instead we can reuse the "delete" and "insert" methods
-        to have this behavior
-        """
-        pass
+        try:
+            deletes = 0
+            for key in self.client.keys(criteria):
+                self.client.delete(key)
+                deletes += 1
+            if deletes == 0:
+                message = "The data does not exist in the DB"
+                return message
+            else: 
+                result = self.client.hmset(key, params)
+                return "Successfully updated"
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err
+       

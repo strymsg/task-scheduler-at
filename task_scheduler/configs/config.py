@@ -14,9 +14,9 @@ class Configuration:
         self.configuration = {}
         filename = os.path.join(os.path.abspath(os.path.dirname(__file__)))
         if os.environ.get('FLASK_ENV') == 'development':
-            filename = os.path.join(filename, 'config.dev.json')
+            filename = os.path.join(filename, 'config.dev.sample.json')
         else:
-            filename = os.path.join(filename, 'config.prod.json')
+            filename = os.path.join(filename, 'config.prod.sample.json')
 
         with open(filename) as jsonfile:
             try:
