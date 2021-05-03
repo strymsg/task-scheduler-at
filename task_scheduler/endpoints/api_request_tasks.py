@@ -1,6 +1,6 @@
 # from task_scheduler.main import app
 from task_scheduler.utils.constants import API_ROUTES, testing_tasks
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
 
@@ -34,6 +34,8 @@ def show_task(task_id):
             if t['task_id'] == task_id:
                 task = t
                 break
+        if 'task_id' not in task:
+            return make_response(jsonify({"message": f"not found {task_id}"}), 404)
         return jsonify(task)
 
 
