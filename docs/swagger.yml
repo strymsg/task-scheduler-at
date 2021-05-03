@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Task scheduler AT
+  description: Task scheduler web application, it allows to create scheduled task of three types; api-request, database, file read/write.
+  version: 0.0.3
+servers:
+  - url: http://localhost:5000
+    description: Development server
+paths:
+  /tasks/all:
+    get:
+      summary: Returns the list o all scheduled tasks
+      responses:
+        '200':
+          description: A JSON array of scheduled tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: "Api-request|Db|File"
+                    priority:
+                      type: integer
+                      example: 0
+                      description: 0 most important
+                    task_id:
+                      type: string
+                      example: task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad
+                    creation_time:
+                      type: string
+                      example: 04/27/2021 13:35:35
+                    config:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          example: https://reqbin.com/echo/post/json
+                        http_method:
+                          type: string
+                          example: POST
+                        config_id:
+                          type: string
+                          example: config_1521bd71-f491-89a3-7a41-4462ccb791ad
+                        headers:
+                          type: object
+                          example: {"Accept":"application/json", "Content-Type": "application/json"}
+                        body:
+                          type: object
+                          example: {
+                          	"Customer": "Jason Sweet",
+                          	"Id": 78912,
+                          	"Price": 18,
+                          	"Quantity": 1
+                          }
+                        api_token:
+                          type: string
+                          example: ""
+                    task_results:
+                      type: array
+                      items:
+                        type: string
+                        example: taskResult_1
+  /tasks/task/{taskID}:
+    get:
+      summary: Returns details of an individual task
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            type: string
+          required: true
+          description: specific task id
+      responses:
+        '404':
+          description: Not found task
+          content:
+            application/json:
+              schema:
+                type: object
+                example: { "message": "not found task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad"}
+        '200':
+          description: taskId details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: "Api-request|Db|File"
+                    priority:
+                      type: integer
+                      example: 0
+                      description: 0 most important
+                    task_id:
+                      type: string
+                      example: task_Api-request_63f1bd71-f441-4519-8a41-44643ccb4dad
+                    creation_time:
+                      type: string
+                      example: 04/27/2021 13:35:35
+                    config:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          example: https://reqbin.com/echo/post/json
+                        http_method:
+                          type: string
+                          example: POST
+                        config_id:
+                          type: string
+                          example: config_1521bd71-f491-89a3-7a41-4462ccb791ad
+                        headers:
+                          type: object
+                          example: {"Accept":"application/json", "Content-Type": "application/json"}
+                        body:
+                          type: object
+                          example: {
+                          	"Customer": "Jason Sweet",
+                          	"Id": 78912,
+                          	"Price": 18,
+                          	"Quantity": 1
+                          }
+                        api_token:
+                          type: string
+                          example: ""
+                    task_results:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          task_result_id:
+                            type: string
+                            example: task-result_1234bc71-e29d-89aa-3db1-90c273b7919b
+                          runBy:
+                            type: string
+                            example: user1
+                          time:
+                            type: string
+                            example: 04/27/2021 14:00:00
+                          error_message:
+                            type: string
+                            example: ""
+                          result:
+                            type: string
+                            example: "status-code: 200"
