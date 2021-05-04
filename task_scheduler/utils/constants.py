@@ -1,14 +1,13 @@
 API_V1 = '/api/v1'
-
 API_ROUTES = {
     'TASKS_ROOT': API_V1 + '/tasks',
-    'TASKS': '/all',
-    'TASK': '/task/',
-    'TASK_API_ADD': '/api-add',
-    'TASK_API_EXECUTE': '/api-exec',
+    'TASKS': API_V1 + '/tasks',  # GET
+    'TASK': API_V1 + '/task/', # GET indivudalmente
+    'TASK_API_ADD': API_V1 + '/api-add',         #
+    'TASK_API_EXECUTE': API_V1 + '/api-exec',
     'CONFIGS': '/all',
     'CONFIGS_ROOT': API_V1 + '/configs',
-    'CONFIG': '/config/'
+    'CONFIG': '/config/',
 }
 
 # just for testing
