@@ -299,9 +299,9 @@ class RedisDbConnection(AbstractDbConnector):
  
     def get(self, criteria):
         try:
-            result = []
+            result = {}
             for key in self.client.keys(criteria):
-                result.append([key,self.client.hgetall(key)])
+                result[key] = self.client.hgetall(key)
             if not result:
                 message = "Nothing was found"
                 return message
@@ -338,7 +338,7 @@ class RedisDbConnection(AbstractDbConnector):
                 message = "The data does not exist in the DB"
                 return message
             else: 
-                result = self.client.hmset(key, params)
+                result = self.client.hmset(criteria, params)
                 return "Successfully updated"
         except TimeoutError as err:
             raise err

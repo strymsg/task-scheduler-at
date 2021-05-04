@@ -8,11 +8,9 @@ from flask_restful import Resource, Api, reqparse
 from flask_apispec.extension import FlaskApiSpec
 from task_scheduler.configs.config import Configuration
 from task_scheduler.utils.logger import CustomLogger
-from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
-from task_scheduler.task_manager import TaskManager
 from task_scheduler.endpoints.db_task_endpoint \
                             import DbTaskEndpoint, DbTaskEndpointById
-
+from task_scheduler.utils.constants import API_ROUTES
 
 def config_logger(config):
     """Configures Logger using the config dict and CustomLogger
@@ -44,8 +42,8 @@ def create_app(test_config=None):
 
     api = Api(app)  # Flask restful wraps Flask app around it.
     docs = FlaskApiSpec(app)    
-    api.add_resource(DbTaskEndpoint, '/api/v1/dbtask/')
-    api.add_resource(DbTaskEndpointById, '/api/v1/dbtask/<string:by_id>')
+    api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
+    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK"]+'/<string:by_id>')
     docs.register(DbTaskEndpoint)
     docs.register(DbTaskEndpointById)
 

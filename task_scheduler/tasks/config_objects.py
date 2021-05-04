@@ -33,6 +33,7 @@ class ConfigApiRequestTask(ConfigObject):
 
 class ConfigDbTask(ConfigObject):
     def __init__(self, args={}):
+        self.key_id = args["key_id"]
         self.query_type = args["query_type"]
         self.query = args["query"]
         self.connector = args["connector"]
@@ -44,6 +45,7 @@ class ConfigDbTask(ConfigObject):
                                 port=self.connector["port"]
                                 )
         super().__init__({
+            'key_id': args["key_id"],
             'query_type': args["query_type"],
             'query': args["query"],
             'connector': {

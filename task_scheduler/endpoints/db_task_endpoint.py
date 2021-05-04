@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api, request
 from apispec import APISpec
 from marshmallow import Schema, fields
@@ -6,89 +6,118 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
-from task_scheduler.tasks.abstract_db_connector import RedisDbConnection
+from task_scheduler.tasks.db_task import DbTask
+from task_scheduler.task_manager import TaskManager
 
-connection_db_app = RedisDbConnection(
-                        db_name="0",
-                        db_host="localhost",
-                        username=None,
-                        password=None, 
-                        port=6379)
 
-connection_db_app.connect()
+class DbTaskConnectorSchema(Schema):
+    select_db = fields.String(required=True, description="Select database")
+    db_name = fields.String(required=True, description="Database name")
+    db_host = fields.String(required=True, description="Host name")
+    port = fields.Integer(required=True, description="Port to connect")
+    password = fields.String(required=True, description="Password credential") 
+    username = fields.String(required=True, description="Username credential")
 
 
 class DbTaskPostRequestSchema(Schema):
     key_id = fields.String(required=True, description="A key to identify the data in the DB")
-    config = fields.String(required=False, description="A key to identify the data in the DB")
-    operation = fields.String(required=False, description="A key to identify the data in the DB")
-
-
-class DbTaskPutRequestSchema(Schema):
-    key_id = fields.String(required=True, description="A key to identify the data in the DB")
+    config_type = fields.String(required=True, description="Type of configuration")
+    query_type = fields.String(required=True, description="Type of query to the DB")
+    query = fields.Dict(required=True, description="Data will be insert or update into the DB")
+    connector = fields.Nested(DbTaskConnectorSchema)
 
 
 #  Restful way of creating APIs through Flask Restful
 class DbTaskEndpoint(MethodResource, Resource):
-    @doc(description='', tags=['dbtask'])
-    # @marshal_with(AwesomeResponseSchema)  # marshalling
+    @doc(description='Returns all the data', tags=['DB Task'])
     def get(self):
-        '''
-        Get method represents a GET API method
-        '''
-        return connection_db_app.get("*")
+        """This method represents a GET API method for DB Task endpoint
+        """
+        configuration = { 
+            "key_id": "",
+            "query_type" : "GET",
+            "config_type" : "Db",
+            "query" :  "*",
+            "connector": {
+                "db_name": "0",
+                "db_host": "localhost",
+                "username": None,
+                "password": None,
+                "port" : 6379
+            }
+        }
+        return jsonify(TaskManager().run_dbtask(configuration))
 
-    @doc(description='', tags=['dbtask'])
+    @doc(description='Creates and updates data into the DB', tags=['DB Task'])
     @use_kwargs(DbTaskPostRequestSchema, location=('json'))
-    # @marshal_with(AwesomeResponseSchema)  # marshalling 
+    @marshal_with(schema={},code=400,description="Bad request server didn't understand due to incorrect syntax")
+    @marshal_with(schema={},code=401,description="Unauthorized access")  
+    @marshal_with(schema={},code=404,description="Data not found") 
     def post(self,**kwargs):
-        '''
-        Get method represents a GET API method
-        '''
+        """This method represents a POST API method for DB Task endpoint
+        """
         data = request.get_json()
-        key_id = data.pop("key_id")
-        connection_db_app.insert(data, key_id)
-        return {'Message': 'Successfully saved'}
-
-    @doc(description='', tags=['dbtask'])
-    @use_kwargs(DbTaskPutRequestSchema, location=('json'))
-    def put(self):
-        '''
-        Get method represents a GET API method
-        '''
-        data = request.get_json()
-        key_id = data.pop("key_id")
-        result = connection_db_app.update(data, key_id)
-        return {'Message': f"{result}"}
-
-
-# class DbTaskByIdGetRequestSchema(Schema):
-#     api_type = fields.String(required=True, description="API type of awesome API")
-#     db_type = fields.Integer(required=True, description="API type of awesome API")
-
-
-# class DbTaskByIdDeleteRequestSchema(Schema):
-#     api_type = fields.String(required=True, description="API type of awesome API")
-#     db_type = fields.Integer(required=True, description="API type of awesome API")
+        configuration = {
+            "key_id" : data["key_id"],
+            "query_type" : data["query_type"],
+            "config_type" : data["config_type"],
+            "query" :  data["query"],
+            "connector": {
+                "db_name": data["connector"]["db_name"],
+                "db_host": data["connector"]["db_host"],
+                "username": data["connector"]["username"],
+                "password": data["connector"]["password"],
+                "port" : data["connector"]["port"]
+            }
+        }
+        # connection_db_app.insert(data, key_id)
+        return jsonify(TaskManager().run_dbtask(configuration))
 
 
 class DbTaskEndpointById(MethodResource, Resource):
-    @doc(description='', tags=['dbtask'])
-    # @use_kwargs(DbTaskByIdGetRequestSchema, location=('json'))
+    @doc(description='Find data by ID', tags=['DB Task'])
+    @marshal_with(schema={},code=400,description="Bad request server didn't understand due to incorrect syntax")
+    @marshal_with(schema={},code=401,description="Unauthorized access")  
+    @marshal_with(schema={},code=404,description="Data not found") 
     def get(self, by_id):
-        '''
-        Get method represents a GET API method
-        '''
-        return connection_db_app.get(f"{by_id}")
+        """This method represents a GET API method for DB Task endpoint by ID
+        """
+        configuration = {
+            "key_id": "", 
+            "query_type": "GET",
+            "config_type": "Db",
+            "query":  f"{by_id}",
+            "connector": {
+                "db_name": "0",
+                "db_host": "localhost",
+                "username": None,
+                "password": None,
+                "port" : 6379
+            }
+        }
+        return jsonify(TaskManager().run_dbtask(configuration))
 
-    @doc(description='', tags=['dbtask'])
-    # @use_kwargs(DbTaskByIdDeleteRequestSchema, location=('json'))
-    # @marshal_with(AwesomeResponseSchema)  # marshalling 
+    @doc(description='Deletes data by ID', tags=['DB Task'])
+    @marshal_with(schema={},code=400,description="Bad request server didn't understand due to incorrect syntax")
+    @marshal_with(schema={},code=401,description="Unauthorized access")  
+    @marshal_with(schema={},code=404,description="Data not found") 
     def delete(self, by_id):
-        '''
-        Get method represents a GET API method
-        '''
-        return connection_db_app.delete(f"{by_id}")
+        """This method represents a DELETE API method for DB Task endpoint by ID
+        """
+        configuration = {
+            "key_id": "", 
+            "query_type": "DELETE",
+            "config_type": "Db",
+            "query":  f"{by_id}",
+            "connector": {
+                "db_name": "0",
+                "db_host": "localhost",
+                "username": None,
+                "password": None,
+                "port" : 6379
+            }
+        }
+        return jsonify(TaskManager().run_dbtask(configuration))
 
 
 

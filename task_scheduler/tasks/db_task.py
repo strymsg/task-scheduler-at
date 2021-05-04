@@ -42,25 +42,18 @@ class DbTask(AbstractTask):
         self.config.db_connection.connect()
         self.logger = CustomLogger(__name__)
         
-    def validate(self):
-        try:
-            a_json = json.loads(document)
-            print(a_json)
-        except:
-            print("Data isn't a JSON")
- 
     # In all of these methods still have to modify the schema for interaction
     # with the Redis database, i.e. add a "key" field in the request.
     #
     # In this case is hard-coded to "key" = "config-" 
     def insert(self):  
-        return self.config.db_connection.insert(self.config.query, "config-")
+        return self.config.db_connection.insert(self.config.query, self.config.key_id)
  
     def get(self):
         return self.config.db_connection.get(self.config.query)
  
     def update(self):
-        return self.config.db_connection.update(self.config.query)
+        return self.config.db_connection.update(self.config.key_id, self.config.query)
  
     def delete(self):
         return self.config.db_connection.delete(self.config.query)
@@ -68,10 +61,6 @@ class DbTask(AbstractTask):
     def execute(self):
         if self.config is None:
             self.logger.error("Need a configuration object to do query to the DB")
-        try:
-            self.validate()
-        except Exception as err:
-            raise err
         else:
             if self.config.query_type.upper() == "INSERT":
                 return self.insert()
