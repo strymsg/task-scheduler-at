@@ -30,10 +30,6 @@ def create_app(test_config=None):
     print("create_app()")
     config_obj = Configuration()
 
-    logger = config_logger(config_obj.configuration)
-    app.config.from_mapping(
-        SECRET_KEY=config_obj.get_config_var('secret_key'),
-    )
     app.config.update(
         {
             'APISPEC_SPEC': APISpec(
@@ -52,6 +48,10 @@ def create_app(test_config=None):
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['TASKS'])
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '<string:task_id>')
 
+    logger = config_logger(config_obj.configuration)
+    app.config.from_mapping(
+        SECRET_KEY=config_obj.get_config_var('secret_key'),
+    )
     logger.info("INITIALIZED TASK SCHEDULER APP")
 
     # registering blueprints for endpoints on different modules

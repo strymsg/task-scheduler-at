@@ -12,16 +12,15 @@ from collections import OrderedDict
 
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
 
-
 class ApiRequestExecuteTaskSchema(Schema):
     #task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
     url = fields.String(required=True, description='The URL to do the request')
     http_method = fields.String(required=True, description='The HTTP METHOD for the request')
-    headers = fields.Nested(
-        'Headers',
-        missing=lambda: OrderedDict([('Accept', 'application/json'),
-                                     ('Content-Type', 'application/json')])
-    )
+    #headers = fields.Nested(
+    #    'Headers',
+    #    missing=lambda: OrderedDict([('Accept', 'application/json'),
+    #                                 ('Content-Type', 'application/json')])
+    #)
     #body = fields.from_dict(
     #    {"prop1": fields.Str(), "prop2": fields.Integer(), "anyprop": fields.String()})
     api_token = fields.String()
