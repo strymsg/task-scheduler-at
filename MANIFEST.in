@@ -1,0 +1,13 @@
+include CONSTRIBUTING.rst
+include License
+include CHANGELOG.rst
+include README.md
+include swagger.yml
+include docs/Mongo-schema.md
+include docs/swagger.yml
+include docs/task-manager.jpg
+include docs/task-manager.xml
+include requirements.dev.txt
+include requirements.txt
+include configs/config.dev.sample.json
+include configs/config.prod.sample.json
