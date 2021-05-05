@@ -87,12 +87,24 @@ class MongoDbConnection(AbstractDbConnector):
             raise(err)
 
     
-    def insert(self, params):
+    # def insert(self, params):
+    #     self.__check_connection_to_db()
+    #     if self.client[self.db_name].count_documents(params, limit = 1):
+    #         return("This document already has this data") 
+    #     else:
+    #         result = self.client[self.db_name].collection1.insert_many([params])
+    #         return result.acknowledged
+
+
+    def insert(self, collection, params):
+        ''' Inserts the given params to the collection to the db
+        :returns: pymongo result.acknowledged
+        '''
         self.__check_connection_to_db()
-        if self.client[self.db_name].collection1.count_documents(params, limit = 1):
-            return("This document already has this data") 
+        if self.client[self.db_name].count_documents(params, limit = 1):
+            return (f'The {collection} document has already this data')
         else:
-            result = self.client[self.db_name].collection1.insert_many([params])
+            result = self.client[self.db_name][collection].insert(params)
             return result.acknowledged
 
 

@@ -1,4 +1,3 @@
-# from task_scheduler.main import app
 from task_scheduler.utils.constants import API_ROUTES, testing_tasks
 from flask import request, jsonify, make_response
 from flask_restful import Resource, request
@@ -9,7 +8,7 @@ from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
 
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
-
+from task_scheduler.tasks.task_manager import TaskManager
 
 class ApiRequestExecuteTaskSchema(Schema):
     #task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
@@ -58,56 +57,25 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
             'api_token': data['api_token']
         }
 
-        # creating task to execute
         config = ConfigApiRequestTask(**request_task)
-        task = ApiRequestTask(0, config=config)
+        # task = ApiRequestTask(0, config=config)
 
-        # creating a task result
+        tm = TaskManager({
+            'type_task': 'Api-request',
+            'configuration_id': config['config_id']
+            })
 
-        try:
-            resp = task.execute()
-            #print(resp)
-            print(resp['json'])
-            return resp['json']
-        except Exception as err:
-            print(f'Error executing task, {err}')
+        tm.execute()
+        tm.save_into_db()
+    
+        if tm.errors is not None:
             return make_response(jsonify({
-                 "message": f"Error executing api-request task, check input: {err}"
-            }), 400)
+                'message': 'Task execution finished with errors',
+                'errors': tm.errors }), 400)
 
-
-
-# bp_tasks = Blueprint(
-#     'api_request_tasks',
-#     __name__,
-#     url_prefix=API_ROUTES["TASKS_ROOT"])
-#
-# # print('FLASK APPPPP', app)
-#
-# @bp_tasks.route('/hola/', methods=['GET', ])
-# def hola():
-#     if request.method == 'GET':
-#         return 'HOLA!'
-#
-#
-# @bp_tasks.route(API_ROUTES['TASKS'], methods=('GET', ))
-# def show_tasks():
-#     if request.method == 'GET':
-#         return jsonify(testing_tasks)
-
-
-# @bp_tasks.route(API_ROUTES['TASK'] + '<string:task_id>', methods=('GET', ))
-# def show_task(task_id):
-#     if request.method == 'GET':
-#         # temporary look for specific task
-#         task = {}
-#         for t in testing_tasks:
-#             if t['task_id'] == task_id:
-#                 task = t
-#                 break
-#         if 'task_id' not in task:
-#             return make_response(jsonify({"message": f"not found {task_id}"}), 404)
-#         return jsonify(task)
+        return make_response(jsonfify({
+            'message': 'Task execution finished succcessfully',
+            'results': tm.response, 'errors': '' }), 200)
 
 # @bp_tasks.route(API_ROUTES['TASK_API_ADD'], methods=('POST', ))
 # def add_task():

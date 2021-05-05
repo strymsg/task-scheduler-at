@@ -3,8 +3,9 @@ from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, Redi
 class ConfigObject:
     def __init__(self, args={}):
         self.args = args
-        # TODO: Define how to get the config_id property
-        self._config_id = ''
+        # For instance:
+        self._config_id = \
+            f'config_{uuid.uuid4()}'
 
     @property
     def config_id(self):
@@ -13,6 +14,7 @@ class ConfigObject:
     @config_id.setter
     def config_id(self, value):
         self._config_id = value
+
 
 class ConfigApiRequestTask(ConfigObject):
     def __init__(self,
@@ -43,6 +45,7 @@ class ConfigDbTask(ConfigObject):
             'port': self.db_connection.port,
             'query': query
         })
+
 
 class ConfigFileTask(ConfigObject):
     def __init__(self, location,
