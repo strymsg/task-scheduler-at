@@ -82,5 +82,8 @@ class TaskManager:
         result = db_task.execute()
         if type(result) == str:
             return {"response": result}
-        else:
+        elif type(result)==bool:
+            return {"response": "Data successfully created"}
+        else: 
             return result
+        

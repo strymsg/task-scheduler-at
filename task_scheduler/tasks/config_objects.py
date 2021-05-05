@@ -1,10 +1,11 @@
+import uuid
 from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, RedisDbConnection
 
 class ConfigObject:
     def __init__(self, args={}):
         self.args = args
         # TODO: Define how to get the config_id property
-        self._config_id = ''
+        self._config_id = f'config_{uuid.uuid4()}'
 
     @property
     def config_id(self):
