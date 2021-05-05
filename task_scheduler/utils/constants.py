@@ -1,7 +1,8 @@
 API_VERSION = '/api/v1'
 
 API_ROUTES = {
-    'DB_TASK': API_VERSION + '/db-task',
+    'DB_TASK': API_VERSION + '/task/db-task',
+    'DB_TASK_BY_ID': API_VERSION + '/task/db-task/<string:by_id>',
     'TASKS': '/all',
     'TASK': '/task/',
     'TASK_API_ADD': '/api-add',

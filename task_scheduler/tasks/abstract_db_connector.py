@@ -1,10 +1,16 @@
 from abc import abstractmethod
 from pymongo import MongoClient
 from redis import Redis
-from pymongo.errors import ServerSelectionTimeoutError, \
-    AutoReconnect, ConnectionFailure, ConfigurationError, OperationFailure
+from pymongo.errors import (
+    ServerSelectionTimeoutError,
+    AutoReconnect,
+    ConnectionFailure,
+    ConfigurationError,
+    OperationFailure,
+)
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
  
+
 class AbstractDbConnector:
     """
     Abstract class used to defind databases connections behaviour
@@ -36,20 +42,16 @@ class AbstractDbConnector:
     update():
         Updates a given data in a specific table into the DB.
     """
+
     def __init__(
-            self, 
-            db_name:str, 
-            db_host:str, 
-            username:str,
-            password:str, 
-            port:int):
- 
+        self, db_name: str, db_host: str, username: str, password: str, port: int
+    ):
         self.db_name = db_name
         self.db_host = db_host
         self.username = username
         self.password = password
         self.port = port
- 
+
     @abstractmethod
     def connect(self):
         pass
@@ -103,6 +105,7 @@ class MongoDbConnection(AbstractDbConnector):
     update():
         Updates a given data in a specific "collection", acoording to a specific "criteria".
     """
+
     __number_of_connections = 0
     __connections = {}
  
@@ -113,8 +116,7 @@ class MongoDbConnection(AbstractDbConnector):
             username:str,
             password:str, 
             port:int):
-        """ Constructor.
-        """
+        """ Constructor."""
         super().__init__(db_name, db_host, username, password, port)
  
         for num_connection, config in MongoDbConnection.__connections.items():
@@ -234,6 +236,7 @@ class RedisDbConnection(AbstractDbConnector):
     update():
         Updates a given data in the DB, acoording to a specific "criteria".
     """ 
+    
     __number_of_connections = 0
     __connections = {}
  

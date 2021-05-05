@@ -43,7 +43,7 @@ def create_app(test_config=None):
     api = Api(app)  # Flask restful wraps Flask app around it.
     docs = FlaskApiSpec(app)    
     api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
-    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK"]+'/<string:by_id>')
+    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
     docs.register(DbTaskEndpoint)
     docs.register(DbTaskEndpointById)
 

@@ -79,5 +79,8 @@ class TaskManager:
         """
         config_dbtask = ConfigDbTask(configuration)
         db_task = DbTask(0, config_dbtask)
-        return db_task.execute()
-    
+        result = db_task.execute()
+        if type(result) == str:
+            return {"response": result}
+        else:
+            return result
