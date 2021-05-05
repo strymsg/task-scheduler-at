@@ -8,9 +8,8 @@ from flask_apispec.extension import FlaskApiSpec
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
 
-from collections import OrderedDict
-
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
+
 
 class ApiRequestExecuteTaskSchema(Schema):
     #task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
@@ -63,6 +62,8 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
         config = ConfigApiRequestTask(**request_task)
         task = ApiRequestTask(0, config=config)
 
+        # creating a task result
+
         try:
             resp = task.execute()
             #print(resp)
@@ -73,6 +74,7 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
             return make_response(jsonify({
                  "message": f"Error executing api-request task, check input: {err}"
             }), 400)
+
 
 
 # bp_tasks = Blueprint(
