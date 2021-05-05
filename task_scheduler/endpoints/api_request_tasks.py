@@ -16,20 +16,19 @@ class ApiRequestExecuteTaskSchema(Schema):
     #task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
     url = fields.String(required=True, description='The URL to do the request')
     http_method = fields.String(required=True, description='The HTTP METHOD for the request')
-    #headers = fields.Nested(
-    #    'Headers',
-    #    missing=lambda: OrderedDict([('Accept', 'application/json'),
-    #                                 ('Content-Type', 'application/json')])
-    #)
+    headers = fields.Dict(description='')
+    body = fields.Dict(description='Request Body (if exists)')
     #body = fields.from_dict(
     #    {"prop1": fields.Str(), "prop2": fields.Integer(), "anyprop": fields.String()})
     api_token = fields.String()
+
 
 class ApiRequestTasksEndpoint(MethodResource, Resource):
     @doc(description='', tags=['apirequesttask'])
     def get(self):
         return jsonify(testing_tasks)
     # TODO: Define get with filters
+
 
 class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
     @doc(description="", tags=['apirequesttask'])
@@ -43,12 +42,15 @@ class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
             return make_response(jsonify({"message": f"not found {task_id}"}), 404)
         return jsonify(task)
 
+
 class ApiRequestTaskExecEndpoint(MethodResource, Resource):
     @doc(description="Execute a task right away", tags=['apirequesttask'])
     @use_kwargs(ApiRequestExecuteTaskSchema, location=('json'))
     def post(self, **kwargs):
         '''Method to execute a task and save its results to db'''
         data = request.get_json()
+        print('=====================')
+        print(data)
         request_task = {
             'url': data['url'],
             'http_method': data['http_method'],
