@@ -8,16 +8,16 @@ regexp = re.compile(r'.*__version__ = [\'\"](.*?)[\'\"]', re.S)
 base_package = 'task_scheduler'
 base_path = os.path.dirname(__file__)
 
-init_file = os.path.join(base_path, 'src', 'task_scheduler', '__init__.py')
-with open(init_file, 'r') as f:
-    module_content = f.read()
+init_file = os.path.join(base_path, 'task_scheduler', '__init__.py')
+# with open(init_file, 'r') as f:
+#     module_content = f.read()
 
-    match = regexp.match(module_content)
-    if match:
-        version = match.group(1)
-    else:
-        raise RuntimeError(
-            'Cannot find __version__ in {}'.format(init_file))
+#     match = regexp.match(module_content)
+#     if match:
+#         version = match.group(1)
+#     else:
+#         raise RuntimeError(
+#             'Cannot find __version__ in {}'.format(init_file))
 
 with open('README.md', 'r') as f:
     readme = f.read()
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         long_description='\n\n'.join([readme, changes]),
         license='MIT license',
         url='https://github.com/strymsg/task-scheduler-at',
-        version=version,
+        # version=version,
         author='Edson and Rodrigo',
         author_email='',
         maintainer='Edson and Rodrigo',
