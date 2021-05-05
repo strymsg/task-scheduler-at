@@ -60,6 +60,14 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
         config = ConfigApiRequestTask(**request_task)
         # task = ApiRequestTask(0, config=config)
 
+        # Just for testing
+        mongo_db_connection = MongoDbConnection(
+            db_name="dbtest1", 
+            db_host="localhost", 
+            username=None, 
+            password=None, 
+            port=27017)
+
         tm = TaskManager({
             'type_task': 'Api-request',
             'configuration_id': config['config_id']
