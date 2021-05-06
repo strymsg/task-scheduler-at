@@ -64,7 +64,7 @@ def create_app(test_config=None):
     docs = FlaskApiSpec(app)
     api.add_resource(ApiRequestTaskExecEndpoint, API_ROUTES['TASK_API_EXECUTE'])
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['TASKS'])
-    api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '<string:task_id>')
+    api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '/<string:task_id>')
     api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
     api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
     docs.register(ApiRequestTasksEndpoint)
