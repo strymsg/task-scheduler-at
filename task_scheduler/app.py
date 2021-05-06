@@ -67,6 +67,9 @@ def create_app(test_config=None):
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '<string:task_id>')
     api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
     api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
+    docs.register(ApiRequestTasksEndpoint)
+    docs.register(ApiRequestTaskExecEndpoint)
+    docs.register(ApiRequestTaskByIdEndpoint)
     docs.register(DbTaskEndpoint)
     docs.register(DbTaskEndpointById)
 

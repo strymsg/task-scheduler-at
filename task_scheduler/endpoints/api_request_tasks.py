@@ -22,7 +22,7 @@ class ApiRequestExecuteTaskSchema(Schema):
 
 
 class ApiRequestTasksEndpoint(MethodResource, Resource):
-    @doc(description='', tags=['apirequesttask'])
+    @doc(description='', tags=['API Task'])
     def get(self):
         #return jsonify(testing_tasks)
         # TODO: Define get with filters
@@ -45,7 +45,7 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
 
 
 class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
-    @doc(description="", tags=['apirequesttask'])
+    @doc(description="", tags=['API Task'])
     def get(self, task_id):
         # TODO: Move this query to DB to another class
         try:
@@ -65,7 +65,7 @@ class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
 
 
 class ApiRequestTaskExecEndpoint(MethodResource, Resource):
-    @doc(description="Execute a task right away", tags=['apirequesttask'])
+    @doc(description="Execute a task right away", tags=['API Task'])
     @use_kwargs(ApiRequestExecuteTaskSchema, location=('json'))
     def post(self, **kwargs):
         '''Method to execute a task and save its results to db'''
