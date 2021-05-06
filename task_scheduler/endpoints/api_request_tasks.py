@@ -86,7 +86,7 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
             'dynamic_configs': request_configs,
         })
 
-        res = tm.execute_dinamically()
+        res = tm.run()
 
         if tm.errors is not None:
             return make_response(jsonify({
