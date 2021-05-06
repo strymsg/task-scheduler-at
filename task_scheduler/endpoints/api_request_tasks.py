@@ -1,5 +1,5 @@
 from task_scheduler.utils.constants import API_ROUTES, testing_tasks
-from flask import request, jsonify, make_response, g, current_app
+from flask import request, jsonify, make_response
 from flask_restful import Resource, request
 from marshmallow import Schema, fields
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -9,16 +9,14 @@ from flask_apispec import marshal_with, doc, use_kwargs
 
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
 from task_scheduler.tasks.task_manager import TaskManager
-from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
+
 
 class ApiRequestExecuteTaskSchema(Schema):
-    #task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
+    # task_id = fields.String(required=True, description='A key of a task saved in the scheduler')
     url = fields.String(required=True, description='The URL to do the request')
     http_method = fields.String(required=True, description='The HTTP METHOD for the request')
-    headers = fields.Dict(description='')
+    headers = fields.Dict(description='Headers of the request')
     body = fields.Dict(description='Request Body (if exists)')
-    #body = fields.from_dict(
-    #    {"prop1": fields.Str(), "prop2": fields.Integer(), "anyprop": fields.String()})
     api_token = fields.String()
 
 
@@ -62,18 +60,22 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
             'type_task': 'Api-request',
             'configuration_id': '',
             'dynamic_configs': request_configs,
-            })
+        })
 
-        tm.execute_dinamically()
-    
+        res = tm.execute_dinamically()
+
         if tm.errors is not None:
             return make_response(jsonify({
                 'message': 'Task execution finished with errors',
-                'errors': tm.errors }), 400)
+                'task_result_id': res['task_result_id'],
+                'config_id': res['config_id'],
+                'errors': tm.errors}), 400)
 
         return make_response(jsonify({
-            'message': 'Task execution finished succcessfully',
-            'results': str(tm.result), 'errors': '' }), 200)
+            'message': 'Task execution finished successfully',
+            'results': str(tm.result), 'errors': '',
+            'task_result_id': res['task_result_id'],
+            'config_id': res['config_id']}), 200)
 
 # @bp_tasks.route(API_ROUTES['TASK_API_ADD'], methods=('POST', ))
 # def add_task():

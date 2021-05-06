@@ -129,7 +129,8 @@ class TaskManager:
         '''Saves the task execution results to the DB. Creates both documents
         config and task_results following the schema defined at docs/Mongo-schema.md
         
-        :returns: True if saved, False and logs error if erro 
+        :returns: A dict with task_result_id and config_id.
+        Empty values if error occurs, errors are logged.
         '''
         config_dbobj = {}
         if self.type_task == "Api-request":
@@ -162,11 +163,10 @@ class TaskManager:
             self.connection_to_db.insert('config', config_dbobj)
             self.connection_to_db.insert('task_result', task_resultdb)
             self.logger.info(f'Task execution saved to DB')
-            return True
+            return {
+                'task_result_id': task_resultdb['task_result_id'],
+                'config_id': config_dbobj['config_id']
+            }
         except Exception as err:
             self.logger.error(f'Error registering task results into db: {err}')
-            return False
-        
-        
-        
-            
+            return {'task_result_id': '', 'config_id': ''}
