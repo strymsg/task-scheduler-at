@@ -114,16 +114,14 @@ class TaskManager:
         elif self.type_task == 'File':
             # TODO: implement
             pass
-
+        
         try:
             self.result = self.task.execute()
-            return True
         except Exception as e:
             self.errors = str(e)
             self.logger.info(f'Error executing task: {self.errors}')
             return False
-
-        print('execute dinamucally')
+        
         res = self.save_into_db()
         return res
 
@@ -134,17 +132,16 @@ class TaskManager:
         
         :returns: True if saved, False and logs error if erro 
         '''
-        print('save)into_db()')
         config_dbobj = {}
         if self.type_task == "Api-request":
             config_objdb = {
                 #'_id': ObjectId(self.config['config_id']),
-                'config_id': self.config['config_id'],
-                'url': self.config['url'],
-                'http_method': self.config['http_method'],
-                'headers': json.dumps(self.config['headers']),
-                'body': json.dumps(self.config['body']),
-                'api_token': self.config['api_token']
+                'config_id': self.config.config_id,
+                'url': self.config.url,
+                'http_method': self.config.http_method,
+                'headers': json.dumps(self.config.headers),
+                'body': json.dumps(self.config.body),
+                'api_token': self.config.api_token
                 }
         elif self.type_task == 'Db':
             # TODO: implement
@@ -158,17 +155,16 @@ class TaskManager:
             "runBy": "user",
             "time": dt.now().strftime('%d/%m/%Y %H:%M:S'),
             "error_message": str(self.errors),
-            "result": str(self.results)
+            "result": str(self.result)
             }
 
-        print('.................................')
         try:
-            a = self.connection_to_db.insert('config', config_dbobj)
-            print('inser1:::', a)
-            a = self.connection_to_db.insert('task_result', task_resultdb)
-            print('iser2:::::', a)
+            self.connection_to_db.connect()
+            self.connection_to_db.insert('config', config_dbobj)
+            self.connection_to_db.insert('task_result', task_resultdb)
+            self.logger.info(f'Task execution saved to DB')
             return True
-        except exception as err:
+        except Exception as err:
             self.logger.error(f'Error registering task results into db: {err}')
             return False
         
