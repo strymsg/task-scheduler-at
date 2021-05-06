@@ -1,10 +1,11 @@
 from task_scheduler.tasks.abstract_task import AbstractTask
 from task_scheduler.tasks.config_objects import ConfigDbTask
+from task_scheduler.utils.exceptions import ConfigurationError
 from task_scheduler.utils.logger import CustomLogger
+
 
 class DbTask(AbstractTask):
     """This class defines the operations to be performed with a specific DB
-
     ...
     Attributes
     ----------
@@ -12,7 +13,6 @@ class DbTask(AbstractTask):
         number assigns a level of priority to run the task
     config : ConfigDbTask
         a configuration object containing the parameters nedded to run the task 
-
     Methods
     -------
     validate():
@@ -28,7 +28,6 @@ class DbTask(AbstractTask):
     """
     def __init__(self, priority, config:ConfigDbTask):
         """Instantiates a Database task
-
         ...
         Attributes
         ----------
@@ -42,26 +41,23 @@ class DbTask(AbstractTask):
 
         self.config.db_connection.connect()
         self.logger = CustomLogger(__name__)
-        
-    # In all of these methods still have to modify the schema for interaction
-    # with the Redis database, i.e. add a "key" field in the request.
-    #
-    # In this case is hard-coded to "key" = "config-" 
+
     def insert(self):  
         return self.config.db_connection.insert(self.config.query, self.config.key_id)
  
     def get(self):
-        return self.config.db_connection.get(self.config.query)
+        return self.config.db_connection.get(self.config.key_id)
  
     def update(self):
         return self.config.db_connection.update(self.config.key_id, self.config.query)
  
     def delete(self):
-        return self.config.db_connection.delete(self.config.query)
+        return self.config.db_connection.delete(self.config.key_id)
  
     def execute(self):
         if self.config is None:
             self.logger.error("Need a configuration object to do query to the DB")
+            raise  ConfigurationError("Need a configuration object to do query to the DB")
         else:
             if self.config.query_type.upper() == "INSERT":
                 return self.insert()

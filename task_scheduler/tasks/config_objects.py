@@ -5,8 +5,7 @@ class ConfigObject:
     def __init__(self, args={}):
         self.args = args
         # For instance:
-        self._config_id = \
-            f'config_{uuid.uuid4()}'
+        self._config_id = f'config_{uuid.uuid4()}'
 
     @property
     def config_id(self):
