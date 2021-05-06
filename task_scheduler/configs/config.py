@@ -25,6 +25,7 @@ class Configuration:
             except JSONDecodeError as err:
                 print(f"Error decoding json {jsonfile.name}")
                 print(err)
+                print('xxxxx')
 
     def get_config_var(self, var_name, default_value=None):
         return self.configuration.get(var_name, default_value)

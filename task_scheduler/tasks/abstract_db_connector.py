@@ -16,8 +16,6 @@ from task_scheduler.utils.logger import CustomLogger
 class AbstractDbConnector:
     """
     Abstract class used to defind databases connections behaviour
-
-    ...
     Attributes
     ----------
     db_name : str
@@ -30,7 +28,6 @@ class AbstractDbConnector:
         the password credential used to access to the database
     port : int
         port to which it will connect to the database
-
     Methods
     -------
     connect():
@@ -48,6 +45,7 @@ class AbstractDbConnector:
     def __init__(
         self, db_name: str, db_host: str, username: str, password: str, port: int
     ):
+
         self.db_name = db_name
         self.db_host = db_host
         self.username = username
@@ -55,10 +53,11 @@ class AbstractDbConnector:
         self.port = port
         self.logger = CustomLogger(__name__)
 
-    @abstractmethod
+        self.logger = CustomLogger(__name__)
+
     def connect(self):
         pass
- 
+
     @abstractmethod
     def insert(self, params):
         pass
@@ -66,21 +65,20 @@ class AbstractDbConnector:
     @abstractmethod
     def get(self, params):
         pass
- 
+
     @abstractmethod
     def delete(self, params):
         pass
- 
+
     @abstractmethod
     def update(self, params):
         pass
  
+
 class MongoDbConnection(AbstractDbConnector):
     """Class used to defined all the requested operations to Mongo DB
     It is not allowed to instantiate twice using the same username, password and port
     it that case it logs an error and returns the former created connection
-
-    ...
     Attributes
     ----------
     db_name : str
@@ -93,7 +91,6 @@ class MongoDbConnection(AbstractDbConnector):
         the password credential used to access to the database
     port : int
         port to which it will connect to the database
-
     Methods
     -------
     __check_connection_to_db():
@@ -112,7 +109,7 @@ class MongoDbConnection(AbstractDbConnector):
 
     __number_of_connections = 0
     __connections = {}
- 
+
     def __init__(
             self, 
             db_name: str, 
@@ -121,17 +118,18 @@ class MongoDbConnection(AbstractDbConnector):
             password: str, 
             port:int):
         """ Constructor."""
+
         super().__init__(db_name, db_host, username, password, port)
- 
+
         for num_connection, config in MongoDbConnection.__connections.items():
             if config["db_name"] == db_name and config["db_host"] == db_host \
-                and config["username"] == username and config["password"] == password \
-                and config["port"] == port:
-                
+                    and config["username"] == username and config["password"] == password \
+                    and config["port"] == port:
                 error = f'''You can't create another MongoDbConnection class using same configs:
-                username: {username}; port: {port}; password {password}
+                username: {username}; port: {port}; password
                 '''
                 self.logger.error(error)
+                raise Exception("You can't create another MongoDbConnection class")
         MongoDbConnection.__number_of_connections += 1
         MongoDbConnection.__connections[MongoDbConnection.__number_of_connections] \
             = {
@@ -141,23 +139,23 @@ class MongoDbConnection(AbstractDbConnector):
             "password": password,
             "port": port
             }
- 
+
     def connect(self):
         self.client = MongoClient(
-                    host=self.db_host, 
-                    port=self.port, 
-                    username=self.username,
-                    password=self.password)
-        response = self.__check_connection_to_db()  
+            host=self.db_host,
+            port=self.port,
+            username=self.username,
+            password=self.password)
+        response = self.__check_connection_to_db()
         return response
- 
+
     def __check_connection_to_db(self):
         try:
             aux = self.client[self.db_name].command("ping")
-            return "Connection Establish" 
+            return "Connection Establish"
         except ServerSelectionTimeoutError as err:
             raise (err)
- 
+            
     def insert(self, collection, params):
         try:
             if self.client[self.db_name][collection].count_documents(params, limit=1):
@@ -169,7 +167,7 @@ class MongoDbConnection(AbstractDbConnector):
             raise err
         finally:
             self.client.close()
- 
+
     def get(self, collection, criteria):
         try:
             result = []
@@ -185,10 +183,10 @@ class MongoDbConnection(AbstractDbConnector):
             raise err
         finally:
             self.client.close()
- 
+
     def delete(self, collection, criteria):
         try:
-            result = self.client[self.db_name][collection].delete_many(criteria) 
+            result = self.client[self.db_name][collection].delete_many(criteria)
             if result.deleted_count == 0:
                 return "Nothing was deleted"
             else:
@@ -197,10 +195,10 @@ class MongoDbConnection(AbstractDbConnector):
             raise err
         finally:
             self.client.close()
-            
+
     def update(self, collection, criteria, params):
         try:
-            result = self.client[self.db_name][collection].update_one(criteria, params) 
+            result = self.client[self.db_name][collection].update_one(criteria, params)
             if result.matched_count == 0:
                 return "Nothing was updated"
             else:
@@ -209,12 +207,10 @@ class MongoDbConnection(AbstractDbConnector):
             raise err
         finally:
             self.client.close()
- 
+
 
 class RedisDbConnection(AbstractDbConnector):
     """Class used to defind all the requested operations to Redis DB
-
-    ...
     Attributes
     ----------
     db_name : str
@@ -227,7 +223,6 @@ class RedisDbConnection(AbstractDbConnector):
         the password credential used to access to the database
     port : int
         port to which it will connect to the database
-
     Methods
     -------
     __check_connection_to_db():
@@ -243,51 +238,50 @@ class RedisDbConnection(AbstractDbConnector):
     update():
         Updates a given data in the DB, acoording to a specific "criteria".
     """ 
-    
+
     __number_of_connections = 0
     __connections = {}
- 
+
     def __init__(
-            self, 
-            db_name:str, 
-            db_host:str, 
-            username:str,
-            password:str, 
-            port:int):
+            self,
+            db_name: str,
+            db_host: str,
+            username: str,
+            password: str,
+            port: int):
         """ Constructor.
         """
         super().__init__(db_name, db_host, username, password, port)
         instance = None
         for num_connection, config in RedisDbConnection.__connections.items():
             if config["db_name"] == db_name and config["db_host"] == db_host \
-                and config["username"] == username and config["password"] == password \
-                and config["port"] == port:
-                
+                    and config["username"] == username and config["password"] == password \
+                    and config["port"] == port:
                 instance = config["instance"]
-                
+
         if not instance:
-            RedisDbConnection.__number_of_connections +=1
+            RedisDbConnection.__number_of_connections += 1
             RedisDbConnection.__connections[RedisDbConnection.__number_of_connections] \
                 = {
-                    "db_name" : db_name,
-                    "db_host" : db_host,
-                    "username" : username,
-                    "password" : password,
-                    "port" : port,
-                    "instance": self
-                }
- 
+                "db_name": db_name,
+                "db_host": db_host,
+                "username": username,
+                "password": password,
+                "port": port,
+                "instance": self
+            }
+
     def connect(self):
         self.client = Redis(
-                        host=self.db_host, 
-                        port=self.port,
-                        db=int(self.db_name), 
-                        username=self.username,
-                        password=self.password,
-                        decode_responses=True)
-        response = self.__check_connection_to_db()  
+            host=self.db_host,
+            port=self.port,
+            db=int(self.db_name),
+            username=self.username,
+            password=self.password,
+            decode_responses=True)
+        response = self.__check_connection_to_db()
         return response
- 
+
     def __check_connection_to_db(self):
         try:
             self.client.ping()
@@ -309,7 +303,7 @@ class RedisDbConnection(AbstractDbConnector):
         except RedisError as err:
             self.logger.error("RedisDB cannot process the query")
             raise DbErrorHandler("RedisDB cannot process the query")
- 
+
     def get(self, criteria):
         try:
             result = {}
@@ -325,7 +319,7 @@ class RedisDbConnection(AbstractDbConnector):
         except RedisError as err:
             self.logger.error("RedisDB cannot process the query")
             raise DbErrorHandler("RedisDB cannot process the query")
- 
+
     def delete(self, criteria):
         try:
             deletes = 0
@@ -342,7 +336,7 @@ class RedisDbConnection(AbstractDbConnector):
         except RedisError as err:
             self.logger.error("RedisDB cannot process the query")
             raise DbErrorHandler("RedisDB cannot process the query")
-            
+
     def update(self, criteria, params):
         try:
             deletes = 0
@@ -360,4 +354,3 @@ class RedisDbConnection(AbstractDbConnector):
         except RedisError as err:
             self.logger.error("RedisDB cannot process the query")
             raise DbErrorHandler("RedisDB cannot process the query")
-       

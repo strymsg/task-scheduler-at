@@ -1,23 +1,5 @@
-import os
-import re
-
 from setuptools import find_packages, setup
 
-regexp = re.compile(r'.*__version__ = [\'\"](.*?)[\'\"]', re.S)
-
-base_package = 'task_scheduler'
-base_path = os.path.dirname(__file__)
-
-init_file = os.path.join(base_path, 'src', 'task_scheduler', '__init__.py')
-with open(init_file, 'r') as f:
-    module_content = f.read()
-
-    match = regexp.match(module_content)
-    if match:
-        version = match.group(1)
-    else:
-        raise RuntimeError(
-            'Cannot find __version__ in {}'.format(init_file))
 
 with open('README.md', 'r') as f:
     readme = f.read()
@@ -25,15 +7,15 @@ with open('README.md', 'r') as f:
 with open('CHANGELOG.rst', 'r') as f:
     changes = f.read()
 
-def parse_requirements(filename):
-    ''' Load requirements from a pip requirements file '''
-    with open(filename, 'r') as fd:
-        lines = []
-        for line in fd:
-            line.strip()
-            if line and not line.startswith("#"):
-                lines.append(line)
-    return lines
+# def parse_requirements(filename):
+#     ''' Load requirements from a pip requirements file '''
+#     with open(filename, 'r') as fd:
+#         lines = []
+#         for line in fd:
+#             line.strip()
+#             if line and not line.startswith("#"):
+#                 lines.append(line)
+#     return lines
 
 
 if __name__ == '__main__':
@@ -41,17 +23,19 @@ if __name__ == '__main__':
         name='task_scheduler',
         description='Task Manager',
         install_requires='requirements',
-        long_description='\n\n'.join([readme, changes]),
-        license='MIT license',
+        python_requires='>=3.5',
+        version="0.1.0",
+        # long_description='\n\n'.join([readme, changes]),
+        # license='MIT license',
         url='https://github.com/strymsg/task-scheduler-at',
-        version=version,
+        # version=version,
         author='Edson and Rodrigo',
         author_email='',
         maintainer='Edson and Rodrigo',
         maintainer_email='',
         keywords=['task_scheduler'],
-        package_dir={'': 'src'},
-        packages=find_packages('src'),
+        # package_dir={'': 'src'},
+        packages=find_packages(include=['task_scheduler', 'task_scheduler.*']),
         zip_safe=False,
         classifiers=['Development Status :: 3 - Alpha',
                      'Intended Audience :: Developers',

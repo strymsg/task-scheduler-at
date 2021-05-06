@@ -6,7 +6,6 @@ from task_scheduler.utils.logger import CustomLogger
 
 class DbTask(AbstractTask):
     """This class defines the operations to be performed with a specific DB
-
     ...
     Attributes
     ----------
@@ -14,7 +13,6 @@ class DbTask(AbstractTask):
         number assigns a level of priority to run the task
     config : ConfigDbTask
         a configuration object containing the parameters nedded to run the task 
-
     Methods
     -------
     validate():
@@ -30,7 +28,6 @@ class DbTask(AbstractTask):
     """
     def __init__(self, priority, config:ConfigDbTask):
         """Instantiates a Database task
-
         ...
         Attributes
         ----------
@@ -41,6 +38,7 @@ class DbTask(AbstractTask):
         """
         super().__init__(priority, type='Db')
         self.config = config
+
         self.config.db_connection.connect()
         self.logger = CustomLogger(__name__)
 
