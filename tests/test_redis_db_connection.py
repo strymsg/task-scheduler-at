@@ -51,15 +51,15 @@ class TestRedisDbConnection(TestCase):
 
     def test_insert_data_already_stored(self):
         case_single_connection.connect()
-        case_single_connection.insert(data,"DATA1")
+        case_single_connection.insert(data,"config-1")
         expected = "This document already has this data"
-        self.assertEqual(case_single_connection.insert(data, "DATA1"), expected)
-        case_single_connection.delete("DATA1")
+        self.assertEqual(case_single_connection.insert(data, "config-1"), expected)
+        case_single_connection.delete("config-1")
 
     def test_insert_new_data(self):
         case_single_connection.connect()
-        self.assertTrue(case_single_connection.insert(new_data, "DATA2"))
-        case_single_connection.delete("DATA2")
+        self.assertTrue(case_single_connection.insert(new_data, "config-2"))
+        case_single_connection.delete("config-2")
 
     def test_get_data(self):
         expected = {
@@ -70,14 +70,14 @@ class TestRedisDbConnection(TestCase):
             "client": "Crude Traders Inc."
             }
         case_single_connection.connect()
-        case_single_connection.insert(data,"DATA1")
-        query = "DATA1"
-        self.assertEqual(case_single_connection.get(query),expected)
+        case_single_connection.insert(data,"config-1")
+        query = "config-1"
+        self.assertEqual(case_single_connection.get(query),[expected])
 
     def test_delete_data(self):
         case_single_connection.connect()
-        case_single_connection.insert(data, "DATA1")
-        query = "DATA1"
+        case_single_connection.insert(data, "config-1")
+        query = "config-1"
         expected = "Delete operation was successful"
         self.assertEqual(case_single_connection.delete(query), expected)
 
