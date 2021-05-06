@@ -13,14 +13,23 @@ virtualenv --python=python3
 pip install -r requirements.txt
 pip install -r requirements.dev.txt
 ```
-Setup and the application
+Setup and run the application
 ```
-export FLASK_APP=task-scheduler
+export FLASK_APP=main.py
 export FLASK_ENV=development
 
-# run the flask server
+# run the flask development server
 flask run
 ```
+
+Setup if using pycharm
+
+1. Edit run configuration
+2. Add flask config and set the following
+3. script path: to venv/bin/flask
+4. Parameters: run
+5. Envirnoment variables: `FLASK_APP=main.py; FLASK_ENV=development; FLASK_DEBUG=1`
+6. Working directory: root directory of task_scheduler app, for instance: /home/ubuntu/prog102-AT-projects/task-scheduler-at
 
 ## Class diagram
 

@@ -4,7 +4,6 @@ from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, Redi
 class ConfigObject:
     def __init__(self, args={}):
         self.args = args
-        # TODO: Define how to get the config_id property
         self._config_id = f'config_{uuid.uuid4()}'
 
     @property
@@ -14,6 +13,9 @@ class ConfigObject:
     @config_id.setter
     def config_id(self, value):
         self._config_id = value
+
+    def todict(self):
+        pass
 
 
 class ConfigApiRequestTask(ConfigObject):
@@ -31,6 +33,14 @@ class ConfigApiRequestTask(ConfigObject):
             'headers': args["headers"]
         })
 
+    def todict(self):
+        return {
+            'config_id': self.config_id,
+            'url': self.url,
+            'http_method': self.http_method,
+            'api_token': self.http_token,
+            'headers': self.headers
+        }
 
 class ConfigDbTask(ConfigObject):
     def __init__(self, args={}):
@@ -59,15 +69,38 @@ class ConfigDbTask(ConfigObject):
             })
 
 
+    def todict(self):
+        return {
+            'config_id': self.config_id,
+            'db_name': self.db_connection.db_name,
+            'db_host': self.db_connection.db_host,
+            'username': self.db_connection.username,
+            'password': self.db_connection.password,
+            'port': self.db_connection.port,
+            'query': self.query
+        }
+
+
+
 class ConfigFileTask(ConfigObject):
-    def __init__(self, args={}):
-        self.location = args["location"]
-        self.file_content = args["file_content"]
-        self.file_encoding = args["file_encoding"]
-        self.type = args["type"]
+    def __init__(self, location,
+                 file_content='', file_encoding='utf-8', file_operation='read'):
+        self.location = location
+        self.file_content = file_content
+        self.file_encoding = file_encoding
+        self.file_operation = file_operation
         super().__init__({
-            'location': args["location"],
-            'file_content': args["file_content"],
-            'file_encoding': args["file_encoding"],
-            'type': args["type"]
+            'location': location,
+            'file_content': file_content,
+            'file_encoding': file_encoding,
+            'file_operation': file_operation
         })
+
+    def todict(self):
+        return {
+            'config_id': self.config_id,
+            'location': self.location,
+            'file_content': self.file_content,
+            'file_encoding': self.file_encoding,
+            'file_operation': self.file_operation
+            }

@@ -41,6 +41,7 @@ class DbTask(AbstractTask):
         """
         super().__init__(priority, type='Db')
         self.config = config
+
         self.config.db_connection.connect()
         self.logger = CustomLogger(__name__)
 
