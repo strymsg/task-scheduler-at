@@ -25,14 +25,14 @@ class CustomLogger(logging.Logger):
         # create console handler and set level to debug
         ch = logging.StreamHandler()
         # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
         # add formatter to ch
         ch.setLevel(self.level)
         ch.setFormatter(formatter)
 
         f_handler = logging.FileHandler('file.log')
         f_handler.setLevel(logging.DEBUG)
-        formatter2 = logging.Formatter(' formatter: %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter2 = logging.Formatter(' formatter: %(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
         f_handler.setFormatter(formatter2)
 
         self.handlers = self.handlers + [ch, f_handler]
