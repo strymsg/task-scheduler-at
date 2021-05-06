@@ -56,7 +56,7 @@ class DbTask(AbstractTask):
         return self.config.db_connection.update(self.config.key_id, self.config.query)
  
     def delete(self):
-        return self.config.db_connection.delete(self.config.query)
+        return self.config.db_connection.delete(self.config.key_id)
  
     def execute(self):
         if self.config is None:

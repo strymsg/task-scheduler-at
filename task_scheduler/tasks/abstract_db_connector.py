@@ -9,7 +9,7 @@ from pymongo.errors import (
     OperationFailure,
 )
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
- 
+from task_scheduler.utils.logger import CustomLogger
 
 class AbstractDbConnector:
     """
@@ -51,6 +51,7 @@ class AbstractDbConnector:
         self.username = username
         self.password = password
         self.port = port
+        self.logger = CustomLogger(__name__)
 
     @abstractmethod
     def connect(self):
@@ -75,6 +76,8 @@ class AbstractDbConnector:
  
 class MongoDbConnection(AbstractDbConnector):
     """Class used to defined all the requested operations to Mongo DB
+    It is not allowed to instantiate twice using the same username, password and port
+    it that case it logs an error and returns the former created connection
 
     ...
     Attributes
@@ -111,10 +114,10 @@ class MongoDbConnection(AbstractDbConnector):
  
     def __init__(
             self, 
-            db_name:str, 
-            db_host:str, 
-            username:str,
-            password:str, 
+            db_name: str, 
+            db_host: str, 
+            username: str,
+            password: str, 
             port:int):
         """ Constructor."""
         super().__init__(db_name, db_host, username, password, port)
@@ -124,15 +127,18 @@ class MongoDbConnection(AbstractDbConnector):
                 and config["username"] == username and config["password"] == password \
                 and config["port"] == port:
                 
-                raise Exception("You can't create another MongoDbConnection class")
-        MongoDbConnection.__number_of_connections +=1
+                error = f'''You can't create another MongoDbConnection class using same configs:
+                username: {username}; port: {port}; password {password}
+                '''
+                self.logger.error(error)
+        MongoDbConnection.__number_of_connections += 1
         MongoDbConnection.__connections[MongoDbConnection.__number_of_connections] \
             = {
-                "db_name" : db_name,
-                "db_host" : db_host,
-                "username" : username,
-                "password" : password,
-                "port" : port
+            "db_name": db_name,
+            "db_host": db_host,
+            "username": username,
+            "password": password,
+            "port": port
             }
  
     def connect(self):
@@ -149,12 +155,12 @@ class MongoDbConnection(AbstractDbConnector):
             aux = self.client[self.db_name].command("ping")
             return "Connection Establish" 
         except ServerSelectionTimeoutError as err:
-            raise(err)
+            raise (err)
  
     def insert(self, collection, params):
         try:
-            if self.client[self.db_name][collection].count_documents(params, limit = 1):
-                return("This document already has this data") 
+            if self.client[self.db_name][collection].count_documents(params, limit=1):
+                return ("This document already has this data") 
             else:
                 result = self.client[self.db_name][collection].insert_one(params)
                 return result.acknowledged
@@ -286,15 +292,15 @@ class RedisDbConnection(AbstractDbConnector):
             self.client.ping()
             return "Connection Establish"
         except ConnectionError as err:
-            raise(err)
+            raise (err)
  
     def insert(self, params, key):
         try:
             if self.client.exists(key) > 0:
-                return("This document already has this data")
+                return ("This document already has this data")
             else:
                 result = self.client.hmset(key, params)
-                return result  
+                return "Data successfully created"  
         except TimeoutError as err:
             raise err
         except RedisError as err:
