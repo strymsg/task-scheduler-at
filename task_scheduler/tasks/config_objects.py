@@ -4,7 +4,9 @@ from task_scheduler.tasks.abstract_db_connector import AbstractDbConnector, Redi
 class ConfigObject:
     def __init__(self, args={}):
         self.args = args
-        self._config_id = f'config_{uuid.uuid4()}'
+        # For instance:
+        self._config_id = \
+            f'config_{uuid.uuid4()}'
 
     @property
     def config_id(self):
