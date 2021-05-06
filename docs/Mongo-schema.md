@@ -68,7 +68,7 @@ For Api-request
 ```json
 {
   "config_id": "config_1521bd71-f491-89a3-7a41-4462ccb791ad",
-  "type": "Api-request",
+  "config_type": "Api-request",
   "url": "https://reqbin.com/echo/post/json",
   "http_method": "POST",
   "headers": {
@@ -91,9 +91,13 @@ For Db
 ```json
 {
   "config_id": "config_3391bd81-f491-89a3-7d41-4412ccb79111",
-  "type": "Db",
+  "key_id": "Config-1",
+  "config_type": "Db",
   "query_type": "update",
-  "query": "HSET clave1 nuevovalor",
+  "query": {
+    "data_aux": "something",
+    "note": "something"
+  },
   "connector": {
     "db_name": "1",
     "port": 6379,
@@ -109,7 +113,7 @@ For file
 ```json
 {
   "config_id": "config_cc91b571-6291-19aa-7db1-2d1273b79190",
-  "type": "File",
+  "config_type": "File",
   "location": "nuevo_archivo.txt",
   "file_operation": "write",
   "file_content": "probando contenido...",

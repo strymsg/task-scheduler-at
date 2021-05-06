@@ -1,4 +1,4 @@
-from task_scheduler.utils.constants import API_ROUTES, testing_tasks
+from task_scheduler.utils.constants import API_ROUTES
 from flask import request, jsonify, make_response, current_app
 from flask_restful import Resource, request
 from marshmallow import Schema, fields
@@ -9,6 +9,7 @@ from flask_apispec import marshal_with, doc, use_kwargs
 
 from task_scheduler.tasks.api_request_task import ApiRequestTask, ConfigApiRequestTask
 from task_scheduler.tasks.task_manager import TaskManager
+from task_scheduler.utils.encoders import JSONEncoder
 
 
 class ApiRequestExecuteTaskSchema(Schema):
@@ -30,10 +31,11 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
             current_app.mongo_connection.connect()
             # TODO: Add filters
             tasks = current_app.mongo_connection.get('tasks', {})
+            #print('....')
             #print(tasks)
             if type(tasks) == str:
                 return make_response(jsonify([]), 200)
-            return make_response(jsonify(tasks), 200)
+            return make_response(JSONEncoder().encode(tasks), 200)
         except Exception as err:
             # TODO: Log
             print(err)
@@ -53,7 +55,7 @@ class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
             if type(tasks) == str:
                 return make_response(jsonify([]), 200)
             #print(tasks)
-            return make_response(jsonify(tasks), 200)
+            return make_response(JSONEncoder().encode(tasks), 200)
         except Exception as err:
             # TODO: Log
             print(err)

@@ -1,8 +1,13 @@
 from abc import abstractmethod
 from pymongo import MongoClient
 from redis import Redis
-from pymongo.errors import ServerSelectionTimeoutError, \
-    AutoReconnect, ConnectionFailure, ConfigurationError, OperationFailure
+from pymongo.errors import (
+    ServerSelectionTimeoutError,
+    AutoReconnect,
+    ConnectionFailure,
+    ConfigurationError,
+    OperationFailure,
+)
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
 
 from task_scheduler.utils.logger import CustomLogger
@@ -40,12 +45,9 @@ class AbstractDbConnector:
     """
 
     def __init__(
-            self,
-            db_name: str,
-            db_host: str,
-            username: str,
-            password: str,
-            port: int):
+        self, db_name: str, db_host: str, username: str, password: str, port: int
+    ):
+
         self.db_name = db_name
         self.db_host = db_host
         self.username = username
@@ -54,7 +56,6 @@ class AbstractDbConnector:
 
         self.logger = CustomLogger(__name__)
 
-    @abstractmethod
     def connect(self):
         pass
 
@@ -106,12 +107,13 @@ class MongoDbConnection(AbstractDbConnector):
     insert():
         Inserts a given data in a specific "collection" into the DB.
     get():
-        Inserts a given data in a specific "collection", acoording to a specific "criteria".
+        Get a given data in a specific "collection", acoording to a specific "criteria".
     delete():
         Deletes a given data in a specific "collection", acoording to a specific "criteria".
     update():
         Updates a given data in a specific "collection", acoording to a specific "criteria".
     """
+
     __number_of_connections = 0
     __connections = {}
 
@@ -177,7 +179,7 @@ class MongoDbConnection(AbstractDbConnector):
         try:
             result = []
             for collect in self.client[self.db_name][collection].find(criteria):
-                collect.pop("_id")
+                # collect.pop("_id")
                 result.append(collect)
             if not result:
                 message = "Nothing was found"
@@ -215,8 +217,7 @@ class MongoDbConnection(AbstractDbConnector):
 
 
 class RedisDbConnection(AbstractDbConnector):
-    """
-    Class used to defind all the requested operations to Redis DB
+    """Class used to defind all the requested operations to Redis DB
 
     Attributes
     ----------
@@ -240,12 +241,13 @@ class RedisDbConnection(AbstractDbConnector):
     insert():
         Inserts a given data in a specific "key" into the DB.
     get():
-        Gets data from the DB, acoording to a specific "criteria".
+        Get data from the DB, acoording to a specific "criteria".
     delete():
         Deletes data in the DB, acoording to a specific "criteria".
     update():
         Updates a given data in the DB, acoording to a specific "criteria".
-    """
+    """ 
+
     __number_of_connections = 0
     __connections = {}
 
@@ -310,9 +312,9 @@ class RedisDbConnection(AbstractDbConnector):
 
     def get(self, criteria):
         try:
-            result = []
+            result = {}
             for key in self.client.keys(criteria):
-                result.append(self.client.hgetall(key))
+                result[key] = self.client.hgetall(key)
             if not result:
                 message = "Nothing was found"
                 return message
@@ -345,3 +347,19 @@ class RedisDbConnection(AbstractDbConnector):
         to have this behavior
         """
         pass
+
+        try:
+            deletes = 0
+            for key in self.client.keys(criteria):
+                self.client.delete(key)
+                deletes += 1
+            if deletes == 0:
+                message = "The data does not exist in the DB"
+                return message
+            else: 
+                result = self.client.hmset(criteria, params)
+                return "Successfully updated"
+        except TimeoutError as err:
+            raise err
+        except RedisError as err:
+            raise err

@@ -12,6 +12,8 @@ from flask_restful import Resource, Api, reqparse
 
 from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoint, \
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
+from task_scheduler.endpoints.db_task_endpoint \
+                            import DbTaskEndpoint, DbTaskEndpointById
 from task_scheduler.utils.constants import API_ROUTES
 
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
@@ -63,12 +65,18 @@ def create_app(test_config=None):
     api.add_resource(ApiRequestTaskExecEndpoint, API_ROUTES['TASK_API_EXECUTE'])
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['TASKS'])
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '<string:task_id>')
+    api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
+    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
+    docs.register(DbTaskEndpoint)
+    docs.register(DbTaskEndpointById)
 
-    logger = config_logger(config_obj.configuration)
+    config_obj = Configuration()
+
+    _logger = config_logger(config_obj.configuration)
     app.config.from_mapping(
         SECRET_KEY=config_obj.get_config_var('secret_key'),
     )
-    logger.info("INITIALIZED TASK SCHEDULER APP")
+    _logger.info("INITIALIZED TASK SCHEDULER APP")
 
     print("------ endpoints ------")
     for rule in app.url_map.iter_rules():
@@ -79,3 +87,4 @@ def create_app(test_config=None):
 
     return app
 
+#app = create_app()

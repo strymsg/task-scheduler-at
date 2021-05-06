@@ -102,7 +102,7 @@ class TaskManager:
         :returns: True if there is no error and False if some error occurs (logs it)
         """
         if self.type_task == "Api-request":
-            self.config = ConfigApiRequestTask(**self.dynamic_configs)
+            self.config = ConfigApiRequestTask(args=self.dynamic_configs)
             self.task = ApiRequestTask(
                 priority=0, # fixed priority
                 config=self.config
