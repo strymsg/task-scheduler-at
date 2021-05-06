@@ -1,5 +1,5 @@
 from task_scheduler.utils.constants import API_ROUTES, testing_tasks
-from flask import request, jsonify, make_response
+from flask import request, jsonify, make_response, current_app
 from flask_restful import Resource, request
 from marshmallow import Schema, fields
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -23,8 +23,21 @@ class ApiRequestExecuteTaskSchema(Schema):
 class ApiRequestTasksEndpoint(MethodResource, Resource):
     @doc(description='', tags=['apirequesttask'])
     def get(self):
-        return jsonify(testing_tasks)
-    # TODO: Define get with filters
+        #return jsonify(testing_tasks)
+        # TODO: Define get with filters
+        # TODO: Move this query to DB to another class
+        try:
+            current_app.mongo_connection.connect()
+            # TODO: Add filters
+            tasks = current_app.mongo_connection.get('tasks', {})
+            #print(tasks)
+            return make_response(jsonify(tasks), 200)
+        except Exception as err:
+            # TODO: Log
+            print(err)
+            return make_response(jsonify({
+                "message": f"Error getting tasks"
+            }), 500)
 
 
 class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
