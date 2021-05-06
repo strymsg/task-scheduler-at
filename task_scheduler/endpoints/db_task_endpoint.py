@@ -61,7 +61,6 @@ class DbTaskEndpoint(MethodResource, Resource):
             data = request.get_json()
             priority = data["priority"]
             configuration = data["configuration"]
-            # return make_response(jsonify(TaskManager().run_dbtask(priority, {**configuration})), 200)
             tm = TaskManager({
                         'type_task': 'Db',
                         'configuration_id': '',
