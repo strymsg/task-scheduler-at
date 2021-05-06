@@ -9,7 +9,7 @@ from flask_apispec.extension import FlaskApiSpec
 from task_scheduler.configs.config import Configuration
 from task_scheduler.utils.logger import CustomLogger
 from task_scheduler.endpoints.db_task_endpoint \
-                            import DbTaskEndpoint, DbTaskEndpointById
+                            import DbTaskEndpoint
 from task_scheduler.utils.constants import API_ROUTES
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 
@@ -58,10 +58,12 @@ def create_app(test_config=None):
     api = Api(app)  # Flask restful wraps Flask app around it.
     docs = FlaskApiSpec(app)    
     api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
-    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
     docs.register(DbTaskEndpoint)
-    docs.register(DbTaskEndpointById)
 
+    print("------ endpoints ------")
+    for rule in app.url_map.iter_rules():
+        print(f'{rule.rule}: {rule.endpoint}')
+    print()
     with app.app_context():
         init_db(app, config_obj.get_config_var('app_db'))
 

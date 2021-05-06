@@ -122,7 +122,7 @@ class TaskManager:
             self.result = self.task.execute()
         except Exception as e:
             self.errors = str(e)
-            self.logger.info(f'Error executing task: {self.errors}')
+            self.logger.error(f'Error executing task: {self.errors}')
             return False
         
         res = self.save_into_db()
@@ -159,44 +159,35 @@ class TaskManager:
         elif self.type_task == 'File':
             # TODO: implement
             pass
-        
+
         task_resultdb = {
             "task_result_id": f"task-result_{uuid.uuid4()}",
             "runBy": "user",
-            "time": dt.now().strftime('%d/%m/%Y %H:%M:S'),
+            "time": dt.now().strftime('%d/%m/%Y %H:%M:%S'),
             "error_message": str(self.errors),
             "result": str(self.result)
             }
 
+        task_obj = {
+            "task_id": self.task.task_id,
+            "creation_time": self.task.creation_time.strftime('%d/%m/%Y %H:%M:%S'),
+            "priority": 0,
+            "type": self.task.type,
+            "config": self.config.config_id,
+            "tasks_results": [task_resultdb["task_result_id"]]
+        }
+
         try:
             self.connection_to_db.connect()
             self.connection_to_db.insert('config', config_dbobj)
+            self.connection_to_db.insert('tasks', task_obj)
             self.connection_to_db.insert('task_result', task_resultdb)
             self.logger.info(f'Task execution saved to DB')
             return {
-                'task_result_id': task_resultdb['task_result_id'],
-                'config_id': config_dbobj['config_id']
+                'config_id': config_dbobj['config_id'],
+                'task_id': task_obj['task_id'],
+                'task_result_id': task_resultdb['task_result_id']
             }
         except Exception as err:
             self.logger.error(f'Error registering task results into db: {err}')
-            return {'task_result_id': '', 'config_id': ''}
-
-    def run_dbtask(self, priority, configuration):
-        """Method to run database tasks with their configurations.
-
-        ...
-        Attributes
-        ----------
-        configuration: dict
-            parameters used to run the databse task
-        """
-        config_dbtask = ConfigDbTask(configuration)
-        db_task = DbTask(priority, config_dbtask)
-        result = db_task.execute()
-        if type(result) == str:
-            return {"response": result}
-        elif type(result)==bool:
-            return {"response": "Data successfully created"}
-        else: 
-            return result
-        
+            return {'task_result_id': '', 'config_id': '', 'task_id': ''}
