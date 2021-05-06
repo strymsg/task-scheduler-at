@@ -60,7 +60,6 @@ class TaskManager:
             "configs": ObjectId(self.configuration_id)
         }
         task_args = self.connection_to_db.get("tasks", run_arg)[0]
-        print('task_args::::', task_args)
         config_args = self.connection_to_db.get(
             "configs",
             {"_id": ObjectId(self.configuration_id)})[0]
@@ -134,7 +133,7 @@ class TaskManager:
         '''
         config_dbobj = {}
         if self.type_task == "Api-request":
-            config_objdb = {
+            config_dbobj = {
                 #'_id': ObjectId(self.config['config_id']),
                 'config_id': self.config.config_id,
                 'url': self.config.url,
