@@ -1,15 +1,15 @@
 API_VERSION = '/api/v1'
 
 API_ROUTES = {
-    'DB_TASK': API_VERSION + '/task/db-task',
-    'DB_TASK_BY_ID': API_VERSION + '/task/db-task/<string:by_id>',
+    'DB_TASK': API_VERSION + '/tasks/db-task',
+    'ALL_TASKS': API_VERSION + '/tasks',
+    'TASKS_BY_ID': API_VERSION + '/tasks/<string:by_id>',
+    'TASKS_BY_TYPE': API_VERSION + '/tasks/<string:by_type>',
     'TASKS': API_VERSION + '/task/api-task/all',
     'TASK': API_VERSION + '/task/api-task',
     'TASK_API_ADD': API_VERSION + '/task/api-task/add',
     'TASK_API_EXECUTE':  API_VERSION + '/task/api-task/exec',
-    'CONFIGS': API_VERSION + '/configs',
-    'CONFIGS_ROOT': API_VERSION + '/configs',
-    'CONFIG': API_VERSION + '/config/'
+    'ALL_CONFIGS': API_VERSION + '/configs',
 }
 
 ## Mongo initial inserts for testing

@@ -3,6 +3,7 @@ from datetime import datetime
 from abc import abstractmethod
 from task_scheduler.utils.logger import CustomLogger
 
+
 class AbstractTask:
     def __init__(self, priority=0, type=''):
         '''Initializates the AbstractTask and generates assigns an

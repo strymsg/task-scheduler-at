@@ -9,7 +9,7 @@ from pymongo.errors import (
     OperationFailure,
 )
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
-
+from task_scheduler.utils.exceptions import DbErrorHandler
 from task_scheduler.utils.logger import CustomLogger
 
 
@@ -53,6 +53,7 @@ class AbstractDbConnector:
         self.username = username
         self.password = password
         self.port = port
+        self.logger = CustomLogger(__name__)
 
         self.logger = CustomLogger(__name__)
 
@@ -74,16 +75,12 @@ class AbstractDbConnector:
     @abstractmethod
     def update(self, params):
         pass
-
+ 
 
 class MongoDbConnection(AbstractDbConnector):
-    """
-
-    Class used to defind all the requested operations to Mongo DB.
+    """Class used to defined all the requested operations to Mongo DB
     It is not allowed to instantiate twice using the same username, password and port
     it that case it logs an error and returns the former created connection
-
-    Class used to defind all the requested operations to Mongo DB
 
     Attributes
     ----------
@@ -118,14 +115,14 @@ class MongoDbConnection(AbstractDbConnector):
     __connections = {}
 
     def __init__(
-            self,
-            db_name: str,
-            db_host: str,
+            self, 
+            db_name: str, 
+            db_host: str, 
             username: str,
-            password: str,
-            port: int):
-        """ Constructor.
-        """
+            password: str, 
+            port:int):
+        """ Constructor."""
+
         super().__init__(db_name, db_host, username, password, port)
 
         for num_connection, config in MongoDbConnection.__connections.items():
@@ -145,7 +142,7 @@ class MongoDbConnection(AbstractDbConnector):
             "username": username,
             "password": password,
             "port": port
-        }
+            }
 
     def connect(self):
         self.client = MongoClient(
@@ -162,11 +159,11 @@ class MongoDbConnection(AbstractDbConnector):
             return "Connection Establish"
         except ServerSelectionTimeoutError as err:
             raise (err)
-
+            
     def insert(self, collection, params):
         try:
             if self.client[self.db_name][collection].count_documents(params, limit=1):
-                return ("This document already has this data")
+                return ("This document already has this data") 
             else:
                 result = self.client[self.db_name][collection].insert_one(params)
                 return result.acknowledged
@@ -294,21 +291,24 @@ class RedisDbConnection(AbstractDbConnector):
     def __check_connection_to_db(self):
         try:
             self.client.ping()
-            return "Connection Establish"
+            return "Connection Established"
         except ConnectionError as err:
-            raise (err)
-
+            self.logger.error("Connection could not be established")
+            raise DbErrorHandler("Connection could not be established")
+ 
     def insert(self, params, key):
         try:
             if self.client.exists(key) > 0:
-                return ("This document already has this data")
+                raise DbErrorHandler("This document already has this data")
             else:
                 result = self.client.hmset(key, params)
-                return result
+                return "Data successfully created"  
         except TimeoutError as err:
-            raise err
+            self.logger.error("RedisDB doesn't response: timeout")
+            raise DbErrorHandler("RedisDB doesn't response: timeout")
         except RedisError as err:
-            raise err
+            self.logger.error("RedisDB cannot process the query")
+            raise DbErrorHandler("RedisDB cannot process the query")
 
     def get(self, criteria):
         try:
@@ -316,14 +316,15 @@ class RedisDbConnection(AbstractDbConnector):
             for key in self.client.keys(criteria):
                 result[key] = self.client.hgetall(key)
             if not result:
-                message = "Nothing was found"
-                return message
+                raise DbErrorHandler("Nothing was found")
             else:
                 return result
         except TimeoutError as err:
-            raise err
+            self.logger.error("RedisDB doesn't response: timeout")
+            raise DbErrorHandler("RedisDB doesn't response: timeout")
         except RedisError as err:
-            raise err
+            self.logger.error("RedisDB cannot process the query")
+            raise DbErrorHandler("RedisDB cannot process the query")
 
     def delete(self, criteria):
         try:
@@ -332,14 +333,15 @@ class RedisDbConnection(AbstractDbConnector):
                 self.client.delete(key)
                 deletes += 1
             if deletes == 0:
-                message = "Nothing was deleted"
-                return message
-            else:
+                raise DbErrorHandler("Nothing found to delete")
+            else: 
                 return "Delete operation was successful"
         except TimeoutError as err:
-            raise err
+            self.logger.error("RedisDB doesn't response: timeout")
+            raise DbErrorHandler("RedisDB doesn't response: timeout")
         except RedisError as err:
-            raise err
+            self.logger.error("RedisDB cannot process the query")
+            raise DbErrorHandler("RedisDB cannot process the query")
 
     def update(self, criteria, params):
         """Here we can remove this method.
@@ -354,12 +356,13 @@ class RedisDbConnection(AbstractDbConnector):
                 self.client.delete(key)
                 deletes += 1
             if deletes == 0:
-                message = "The data does not exist in the DB"
-                return message
+                raise DbErrorHandler("The data does not exist in the DB")
             else: 
                 result = self.client.hmset(criteria, params)
                 return "Successfully updated"
         except TimeoutError as err:
-            raise err
+            self.logger.error("RedisDB doesn't response: timeout")
+            raise DbErrorHandler("RedisDB doesn't response: timeout")
         except RedisError as err:
-            raise err
+            self.logger.error("RedisDB cannot process the query")
+            raise DbErrorHandler("RedisDB cannot process the query")
