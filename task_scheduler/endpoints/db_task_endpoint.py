@@ -77,8 +77,3 @@ class DbTaskEndpoint(MethodResource, Resource):
                     'task_result_id': res['task_result_id'],
                     'task_id': res['task_id'],
                     'config_id': res['config_id']}), 200)
-       
-
-
-
-
