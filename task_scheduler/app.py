@@ -1,7 +1,7 @@
 __version__ = "0.0.2"
 import os
 import logging
-from flask import Flask
+from flask import Flask, g
 
 from task_scheduler.configs.config import Configuration
 from task_scheduler.utils.logger import CustomLogger
@@ -9,11 +9,12 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_restful import Resource, Api, reqparse
-#from task_scheduler.endpoints.api_request_tasks import bp_tasks
+
 from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoint, \
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.utils.constants import API_ROUTES
 
+from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 
 def config_logger(config):
     '''Configures Logger using the config dict and CustomLogger
@@ -23,6 +24,21 @@ def config_logger(config):
     '''
     logger = CustomLogger(__name__, config)
     return logger
+
+def init_db(app, db_configs):
+    # connection to the mongo database
+    if 'db' not in g:
+        mongo_connection = MongoDbConnection(
+            db_name=db_configs['name'],
+            username=db_configs['username'],
+            db_host='localhost',
+            password=db_configs['password'],
+            port=db_configs['port']
+            )
+        g.db = mongo_connection
+        app.mongo_connection = mongo_connection
+    return g.db
+
 
 def create_app(test_config=None):
     import pprint
@@ -54,14 +70,12 @@ def create_app(test_config=None):
     )
     logger.info("INITIALIZED TASK SCHEDULER APP")
 
-    # registering blueprints for endpoints on different modules
-    # app.register_blueprint(bp_tasks)
-    #
     print("------ endpoints ------")
     for rule in app.url_map.iter_rules():
         print(f'{rule.rule}: {rule.endpoint}')
-
-
+    print()
+    with app.app_context():
+        init_db(app, config_obj.get_config_var('app_db'))
 
     return app
 

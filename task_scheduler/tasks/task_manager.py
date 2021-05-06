@@ -1,5 +1,9 @@
-from task_scheduler.utils.logger import CustomLogger
+import json
+import uuid
+from datetime import datetime as dt
+from flask import current_app
 
+from task_scheduler.utils.logger import CustomLogger
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 from task_scheduler.tasks.config_objects \
     import ConfigFileTask, ConfigApiRequestTask, ConfigDbTask
@@ -31,12 +35,18 @@ class TaskManager:
         Initializes the configuration object and the task object to be executed
     """
 
-    def __init__(self, params, db_connection: MongoDbConnection):
+    def __init__(self, params, db_connection: MongoDbConnection=None,
+                 dynamic_configs=None):
         self.type_task = params["type_task"]
         self.configuration_id = params["configuration_id"]
-        self.connection_to_db = db_connection
+        if db_connection is None:
+            self.connection_to_db = current_app.mongo_connection
+            # self.connection_to_db = g.db # global db connection
+        else:
+            self.connection_to_db = db_connection
+        self.dynamic_configs = params.get('dynamic_configs', {})
 
-        self.response = None
+        self.result = None
         self.errors = None
         self.logger = CustomLogger(__name__)
 
@@ -50,13 +60,15 @@ class TaskManager:
             "configs": ObjectId(self.configuration_id)
         }
         task_args = self.connection_to_db.get("tasks", run_arg)[0]
+        print('task_args::::', task_args)
         config_args = self.connection_to_db.get(
             "configs",
             {"_id": ObjectId(self.configuration_id)})[0]
         self.instantiate(task_args, config_args)
+
         try:
-            self.response = self.task.sxecute()
-            return self.response
+            self.result = self.task.execute()
+            return self.result
         except Exception as e:
             self.errors = str(e)
             self.logger.info(f'Error executing task: {self.errors}')
@@ -83,3 +95,83 @@ class TaskManager:
                 priority=task_args["priority"],
                 config=self.config
             )
+
+    def execute_dinamically(self):
+        """Executes the task and saves its results to the DB.
+        It creates a config object and task result to be into Db using self.save_into_db()
+
+        :returns: True if there is no error and False if some error occurs (logs it)
+        """
+        if self.type_task == "Api-request":
+            self.config = ConfigApiRequestTask(**self.dynamic_configs)
+            self.task = ApiRequestTask(
+                priority=0, # fixed priority
+                config=self.config
+            )
+        elif self.type_task == 'Db':
+            # TODO: implement
+            pass
+        elif self.type_task == 'File':
+            # TODO: implement
+            pass
+
+        try:
+            self.result = self.task.execute()
+            return True
+        except Exception as e:
+            self.errors = str(e)
+            self.logger.info(f'Error executing task: {self.errors}')
+            return False
+
+        print('execute dinamucally')
+        res = self.save_into_db()
+        return res
+
+        
+    def save_into_db(self):
+        '''Saves the task execution results to the DB. Creates both documents
+        config and task_results following the schema defined at docs/Mongo-schema.md
+        
+        :returns: True if saved, False and logs error if erro 
+        '''
+        print('save)into_db()')
+        config_dbobj = {}
+        if self.type_task == "Api-request":
+            config_objdb = {
+                #'_id': ObjectId(self.config['config_id']),
+                'config_id': self.config['config_id'],
+                'url': self.config['url'],
+                'http_method': self.config['http_method'],
+                'headers': json.dumps(self.config['headers']),
+                'body': json.dumps(self.config['body']),
+                'api_token': self.config['api_token']
+                }
+        elif self.type_task == 'Db':
+            # TODO: implement
+            pass
+        elif self.type_task == 'File':
+            # TODO: implement
+            pass
+        
+        task_resultdb = {
+            "task_result_id": f"task-result_{uuid.uuid4()}",
+            "runBy": "user",
+            "time": dt.now().strftime('%d/%m/%Y %H:%M:S'),
+            "error_message": str(self.errors),
+            "result": str(self.results)
+            }
+
+        print('.................................')
+        try:
+            a = self.connection_to_db.insert('config', config_dbobj)
+            print('inser1:::', a)
+            a = self.connection_to_db.insert('task_result', task_resultdb)
+            print('iser2:::::', a)
+            return True
+        except exception as err:
+            self.logger.error(f'Error registering task results into db: {err}')
+            return False
+        
+        
+        
+            
