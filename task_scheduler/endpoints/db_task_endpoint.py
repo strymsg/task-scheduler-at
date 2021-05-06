@@ -50,7 +50,7 @@ class DbTaskEndpoint(MethodResource, Resource):
                         'configuration_id': '',
                         'dynamic_configs': configuration,
                         })
-            res = tm.execute_dinamically()
+            res = tm.run()
 
         except:
             return make_response(jsonify({

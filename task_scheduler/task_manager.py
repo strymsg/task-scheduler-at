@@ -49,50 +49,8 @@ class TaskManager:
         self.errors = None
         self.logger = CustomLogger(__name__)
         
-    def execute(self):
-        """Executes the task given the configs and saves its results in self object
-        :return:
-        """
 
-        run_arg = {
-            "type": self.type_task,
-            "configs": ObjectId(self.configuration_id)
-        }
-        task_args = self.connection_to_db.get("tasks", run_arg)[0]
-        config_args = self.connection_to_db.get("configs", {"_id":ObjectId(self.configuration_id)})[0]
-        self.instantiate(task_args, config_args)
-        
-        try:
-            self.result = self.task.execute()
-            return self.result
-        except Exception as e:
-            self.errors = str(e)
-            self.logger.info(f'Error executing task: {self.errors}')
-            return self.errors
-
-    def instantiate(self, task_args, config_args):
-        if self.type_task == "Api-request":
-            self.config = ConfigApiRequestTask(config_args)
-            self.task = ApiRequestTask(
-                            priority=task_args["priority"],
-                            config=self.config
-                            )
-
-        elif self.type_task == "Db":
-            self.config = ConfigDbTask(config_args)
-            self.task = DbTask(
-                            priority=task_args["priority"],
-                            config=self.config
-                            )
-
-        elif self.type_task == "File":
-            self.config = ConfigFileTask(config_args)
-            self.task = FileTask(
-                            priority=task_args["priority"],
-                            config=self.config
-                            )
-
-    def execute_dinamically(self):
+    def run(self):
         """Executes the task and saves its results to the DB.
         It creates a config object and task result to be into Db using self.save_into_db()
         :returns: True if there is no error and False if some error occurs (logs it)
@@ -189,3 +147,46 @@ class TaskManager:
         except Exception as err:
             self.logger.error(f'Error registering task results into db: {err}')
             return {'task_result_id': '', 'config_id': '', 'task_id': ''}
+            
+    # def execute(self):
+    #     """Executes the task given the configs and saves its results in self object
+    #     :return:
+    #     """
+
+    #     run_arg = {
+    #         "type": self.type_task,
+    #         "configs": ObjectId(self.configuration_id)
+    #     }
+    #     task_args = self.connection_to_db.get("tasks", run_arg)[0]
+    #     config_args = self.connection_to_db.get("configs", {"_id":ObjectId(self.configuration_id)})[0]
+    #     self.instantiate(task_args, config_args)
+        
+    #     try:
+    #         self.result = self.task.execute()
+    #         return self.result
+    #     except Exception as e:
+    #         self.errors = str(e)
+    #         self.logger.info(f'Error executing task: {self.errors}')
+    #         return self.errors
+
+    # def instantiate(self, task_args, config_args):
+    #     if self.type_task == "Api-request":
+    #         self.config = ConfigApiRequestTask(config_args)
+    #         self.task = ApiRequestTask(
+    #                         priority=task_args["priority"],
+    #                         config=self.config
+    #                         )
+
+    #     elif self.type_task == "Db":
+    #         self.config = ConfigDbTask(config_args)
+    #         self.task = DbTask(
+    #                         priority=task_args["priority"],
+    #                         config=self.config
+    #                         )
+
+    #     elif self.type_task == "File":
+    #         self.config = ConfigFileTask(config_args)
+    #         self.task = FileTask(
+    #                         priority=task_args["priority"],
+    #                         config=self.config
+    #                         )
