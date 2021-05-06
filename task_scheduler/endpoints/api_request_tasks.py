@@ -31,6 +31,8 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
             # TODO: Add filters
             tasks = current_app.mongo_connection.get('tasks', {})
             #print(tasks)
+            if type(tasks) == str:
+                return make_response(jsonify([]), 200)
             return make_response(jsonify(tasks), 200)
         except Exception as err:
             # TODO: Log
@@ -43,14 +45,21 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
 class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
     @doc(description="", tags=['apirequesttask'])
     def get(self, task_id):
-        task = {}
-        for t in testing_tasks:
-            if t['task_id'] == task_id:
-                task = t
-                break
-        if 'task_id' not in task:
-            return make_response(jsonify({"message": f"not found {task_id}"}), 404)
-        return jsonify(task)
+        # TODO: Move this query to DB to another class
+        try:
+            current_app.mongo_connection.connect()
+            # TODO: Add filters
+            tasks = current_app.mongo_connection.get('tasks', {'task_id': task_id})
+            if type(tasks) == str:
+                return make_response(jsonify([]), 200)
+            #print(tasks)
+            return make_response(jsonify(tasks), 200)
+        except Exception as err:
+            # TODO: Log
+            print(err)
+            return make_response(jsonify({
+                "message": f"Error getting tasks"
+            }), 500)
 
 
 class ApiRequestTaskExecEndpoint(MethodResource, Resource):
