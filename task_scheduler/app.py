@@ -2,6 +2,7 @@ __version__ = "0.0.3"
 import os
 import logging
 from flask import Flask, g
+
 from task_scheduler.configs.config import Configuration
 from task_scheduler.utils.logger import CustomLogger
 from apispec import APISpec
@@ -12,8 +13,9 @@ from flask_restful import Resource, Api, reqparse
 from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoint, \
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.endpoints.db_task_endpoint \
-                            import DbTaskEndpoint
+                            import DbTaskEndpoint, DbTaskEndpointById
 from task_scheduler.utils.constants import API_ROUTES
+
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 
 def config_logger(config):
@@ -39,11 +41,11 @@ def init_db(app, db_configs):
         app.mongo_connection = mongo_connection
     return g.db
 
+
 def create_app(test_config=None):
     import pprint
     app = Flask(__name__)
     print("create_app()")
-
     config_obj = Configuration()
 
     app.config.update(
@@ -64,10 +66,14 @@ def create_app(test_config=None):
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['TASKS'])
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['TASK'] + '/<string:task_id>')
     api.add_resource(DbTaskEndpoint, API_ROUTES["DB_TASK"])
+    api.add_resource(DbTaskEndpointById, API_ROUTES["DB_TASK_BY_ID"])
     docs.register(ApiRequestTasksEndpoint)
     docs.register(ApiRequestTaskExecEndpoint)
     docs.register(ApiRequestTaskByIdEndpoint)
     docs.register(DbTaskEndpoint)
+    docs.register(DbTaskEndpointById)
+
+    config_obj = Configuration()
 
     _logger = config_logger(config_obj.configuration)
     app.config.from_mapping(
@@ -83,3 +89,5 @@ def create_app(test_config=None):
         init_db(app, config_obj.get_config_var('app_db'))
 
     return app
+
+#app = create_app()
