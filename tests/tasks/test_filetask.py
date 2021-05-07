@@ -14,14 +14,14 @@ class TestFileTask(TestCase):
             location=path.join(self.__location__,
                                'res', 'testfile.txt'),
             file_encoding='utf-8',
-            type='read')
+            file_operation='read')
         self.config_nonexistenfile = ConfigFileTask(
             location='inexistente')
         self.config_writefile = ConfigFileTask(
             location=path.join(self.__location__, 'res', 'testwrite.txt'),
             file_encoding='utf-8',
             file_content='Contenido de pruebas',
-            type='write'
+            file_operation='write'
         )
     def tearDown(self):
         self.config_existent = None
@@ -45,7 +45,7 @@ class TestFileTask(TestCase):
                 location=path.join(self.__location__,
                                    'res', 'testwrite.txt'),
                 file_encoding='utf-8',
-                type='read'
+                file_operation='read'
             ))
             content = file_task1.execute()
             self.assertEqual(content, 'Contenido de pruebas')

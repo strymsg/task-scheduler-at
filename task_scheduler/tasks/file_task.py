@@ -2,7 +2,7 @@ from task_scheduler.tasks.abstract_task import AbstractTask
 from task_scheduler.tasks.config_objects import ConfigFileTask
 
 class FileTask(AbstractTask):
-    def __init__(self, priority, config:ConfigFileTask):
+    def __init__(self, priority, config: ConfigFileTask):
         ''' Instantiates a File task
         :param priority: from 0 (most important) to any greater integer
         :param config(ConfigFileTask): Configuration parameters
@@ -34,13 +34,13 @@ class FileTask(AbstractTask):
             raise err
 
     def execute(self):
-        if self.config.type.lower() == 'write':
+        if self.config.file_operation.lower() == 'write':
             try:
                 self.write_file()
             except Exception as err:
                 # TODO: log
                 raise err
-        elif self.config.type.lower() == 'read':
+        elif self.config.file_operation.lower() == 'read':
             try:
                 return self.read_file()
             except Exception as err:
