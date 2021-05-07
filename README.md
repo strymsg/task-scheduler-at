@@ -80,3 +80,11 @@ Setup if using pycharm
 
 The app main database uses mongo. See [docs/Mongo-schema.md](docs/Mongo-schema.md)
 
+### Execute tests
+
+```
+# with virtualenvironment activated
+pip3 install tox
+# execute
+tox
+```
