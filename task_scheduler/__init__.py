@@ -1,5 +1,6 @@
 """
 Task Manager and Scheduler
 """
-
-__version__ = "0.0.1"
+__author__ = """Edson and Rodrigo"""
+__email__ = ''
+__version__ = '0.1.0'
