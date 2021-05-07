@@ -6,26 +6,29 @@ from task_scheduler.tasks.config_objects import ConfigApiRequestTask
 
 class TestApiTask(TestCase):
     def setUp(self):
-        self.config_api_get = ConfigApiRequestTask(
-            'https://api.github.com', http_method='get')
-        self.config_api_post = ConfigApiRequestTask(
-            'https://reqbin.com/echo/post/json',
-            http_method='post',
-            headers={ 'Accept': 'application/json', 'Content-Type': 'application/json'},
-            body={
+        self.config_api_get = ConfigApiRequestTask({
+            'url': 'https://api.github.com',
+            'http_method': 'get'})
+        self.config_api_post = ConfigApiRequestTask(args={
+            'url': 'https://reqbin.com/echo/post/json',
+            'http_method': 'post',
+            'headers': {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            'body': {
                 "Id": 78912,
                 "Customer": "Jason Sweet",
                 "Quantity": 1,
-                "Price": 18.00
+                "Price": 18.00}
         })
-        self.config_api_patch = ConfigApiRequestTask(
-            'https://httpbin.org/patch',
-            http_method='patch',
-            headers={ 'Accept': 'application/json', 'Content-Type': 'application/json'},
-            body={ 'key': 'value' })
-        self.config_api_delete = ConfigApiRequestTask(
-            'https://httpbin.org/delete',
-             http_method='delete')
+        self.config_api_patch = ConfigApiRequestTask(args={
+            'url': 'https://httpbin.org/patch',
+            'http_method': 'patch',
+            'headers': {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            'body': {'key': 'value'}
+        })
+        self.config_api_delete = ConfigApiRequestTask(args={
+            'url': 'https://httpbin.org/delete',
+            'http_method':     'delete'
+            })
 
     def tearDown(self):
         self.config_api_get = None
@@ -67,17 +70,17 @@ class TestApiTask(TestCase):
         self.assertEqual(resp['status_code'], 200)
 
     def test_get_notfound(self):
-        config = ConfigApiRequestTask(
-            'https://api.github.com/inex',
-            http_method='get')
+        config = ConfigApiRequestTask(args={
+            'url': 'https://api.github.com/inex',
+            'http_method': 'get'})
         api_task = ApiRequestTask(0, config=config)
         resp = api_task.execute()
         self.assertEqual(resp['status_code'], 404)
 
     def test_request_fail1(self):
-        config = ConfigApiRequestTask(
-            'https://api.nutexis.cualquiercosa',
-            http_method='get')
+        config = ConfigApiRequestTask(args={
+            'url': 'https://api.nutexis.cualquiercosa',
+            'http_method': 'get'})
         api_task = ApiRequestTask(0, config=config)
         try:
             resp = api_task.execute()

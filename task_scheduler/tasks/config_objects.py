@@ -21,17 +21,17 @@ class ConfigObject:
 
 class ConfigApiRequestTask(ConfigObject):
     def __init__(self, args={}):
-        self.url = args["url"]
-        self.http_method = args["http_method"]
-        self.body = args["body"]
-        self.api_token = args["api_token"]
-        self.headers = args["headers"]
+        self.url = args.get("url", "")
+        self.http_method = args.get("http_method", 'GET')
+        self.body = args.get("body", {})
+        self.api_token = args.get("api_token", "")
+        self.headers = args.get("headers", {})
         super().__init__({
-            'url': args["url"],
-            'http_method': args["http_method"],
-            'body': args["body"],
-            'api_token': args["api_token"],
-            'headers': args["headers"]
+            'url': self.url,
+            'http_method': self.http_method,
+            'body': self.body,
+            'api_token': self.api_token,
+            'headers': self.headers
         })
 
     def todict(self):

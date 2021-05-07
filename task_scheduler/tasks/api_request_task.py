@@ -9,7 +9,7 @@ from task_scheduler.tasks.config_objects import ConfigApiRequestTask
 from task_scheduler.utils.logger import CustomLogger
 
 class ApiRequestTask(AbstractTask):
-    def __init__(self, priority, config:ConfigApiRequestTask):
+    def __init__(self, priority, config: ConfigApiRequestTask):
         ''' Instantiates an Api request task
         :param priority: from 0 (most important) to any greater integer
         :param config(ConfigApiRequestTask): Configuration parameters

@@ -95,7 +95,7 @@ class TaskManager:
                 config=self.config
             )
 
-    def execute_dinamically(self):
+    def run(self):
         """Executes the task and saves its results to the DB.
         It creates a config object and task result to be into Db using self.save_into_db()
         :returns: True if there is no error and False if some error occurs (logs it)
