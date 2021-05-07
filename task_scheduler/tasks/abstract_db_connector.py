@@ -15,7 +15,7 @@ from task_scheduler.utils.logger import CustomLogger
 
 class AbstractDbConnector:
     """
-    Abstract class used to defind databases connections behaviour
+    Abstract class used to defined databases connections behaviour
     Attributes
     ----------
     db_name : str

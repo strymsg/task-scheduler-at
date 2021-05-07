@@ -72,7 +72,9 @@ class TestMongoDbConnection(TestCase):
         case_single_connection.connect()
         case_single_connection.insert("config-task", data)
         query = {"limit": {"$eq":48.90}}
-        self.assertEqual(case_single_connection.get("config-task", query)[0], expected)
+        res = case_single_connection.get("config-task", query)[0]
+        res.pop("_id")
+        self.assertEqual(res, expected)
 
     def test_delete_data(self):
         case_single_connection.connect()

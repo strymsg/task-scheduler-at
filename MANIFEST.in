@@ -1,4 +1,4 @@
-include CONSTRIBUTING.rst
+include CONTRIBUTING.rst
 include License
 include CHANGELOG.rst
 include README.md
@@ -11,3 +11,4 @@ include requirements.dev.txt
 include requirements.txt
 include configs/config.dev.sample.json
 include configs/config.prod.sample.json
+include file.log
