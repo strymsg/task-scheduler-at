@@ -21,8 +21,38 @@ class ApiRequestExecuteTaskSchema(Schema):
     api_token = fields.String()
 
 
+class Resp200Schema(Schema):
+    _id = fields.String()
+    task_id = fields.String(description='Task id')
+    creation_time = fields.String()
+    priority = fields.Integer(description='Default to 0 (most important)')
+    config = fields.String(description='Configuration id')
+    task_results = fields.List(fields.String())
+    type = fields.String()
+
+class Resp200ExecSchema(Schema):
+    message = fields.String()
+    errors = fields.String(default='')
+    results = fields.Dict()
+    task_result_id = fields.String()
+    config_id = fields.String()
+
+class Resp400ExecSchema(Schema):
+    errors = fields.String()
+    message = fields.String()
+    task_result_id = fields.String()
+    config_id = fields.String()
+
+class Resp400Schema(Schema):
+    message = fields.String(description='Error message')
+
 class ApiRequestTasksEndpoint(MethodResource, Resource):
-    @doc(description='', tags=['API Task'])
+
+    @doc(description='Get api request tasks', tags=['API Task'])
+    @marshal_with(Resp200Schema,
+                  code=200, description='Success getting Api-request tasks')
+    @marshal_with(Resp400Schema, code=400, description='Error doing the request')
+    @marshal_with(Resp400Schema, code=500, description='Internal error')
     def get(self):
         #return jsonify(testing_tasks)
         # TODO: Define get with filters
@@ -35,7 +65,6 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
             #print(tasks)
             if type(tasks) == str:
                 return make_response(jsonify([]), 200)
-            #print(json.loads(JSONEncoder().encode(tasks)))
             return make_response(jsonify(json.loads(JSONEncoder().encode(tasks))), 200)
         except Exception as err:
             # TODO: Log
@@ -47,6 +76,9 @@ class ApiRequestTasksEndpoint(MethodResource, Resource):
 
 class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
     @doc(description="", tags=['API Task'])
+    @marshal_with(Resp200Schema,
+                  code=200, description='Success getting Api-request tasks')
+    @marshal_with(Resp200Schema, code=400, description='Error getting specific task')
     def get(self, task_id):
         # TODO: Move this query to DB to another class
         try:
@@ -67,12 +99,15 @@ class ApiRequestTaskByIdEndpoint(MethodResource, Resource):
 
 class ApiRequestTaskExecEndpoint(MethodResource, Resource):
     @doc(description="Execute a task right away", tags=['API Task'])
+    @marshal_with(Resp200ExecSchema,
+                  code=200, description='Response of executing the given task')
+    @marshal_with(Resp400ExecSchema,
+                  code=400, description='Error executing the task')
     @use_kwargs(ApiRequestExecuteTaskSchema, location=('json'))
     def post(self, **kwargs):
         '''Method to execute a task and save its results to db'''
         data = request.get_json()
-        print('=====================')
-        print(data)
+
         request_configs = {
             'url': data['url'],
             'http_method': data['http_method'],
@@ -98,7 +133,8 @@ class ApiRequestTaskExecEndpoint(MethodResource, Resource):
 
         return make_response(jsonify({
             'message': 'Task execution finished successfully',
-            'results': str(tm.result), 'errors': '',
+            'results': str(tm.result),
+            'errors': '',
             'task_result_id': res['task_result_id'],
             'config_id': res['config_id']}), 200)
 
