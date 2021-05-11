@@ -9,5 +9,3 @@ include docs/task-manager.jpg
 include docs/task-manager.xml
 include requirements.dev.txt
 include requirements.txt
-include task_scheduler/configs/config.dev.sample.json
-include task_scheduler/configs/config.prod.sample.json
