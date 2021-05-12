@@ -88,3 +88,9 @@ pip3 install tox
 # execute
 tox
 ```
+
+### Building and running
+
+```bash
+bash build-and-test.sh
+```
