@@ -1,4 +1,5 @@
 include CONTRIBUTING.rst
+include main.py
 include License
 include CHANGELOG.rst
 include README.md
@@ -9,3 +10,5 @@ include docs/task-manager.jpg
 include docs/task-manager.xml
 include requirements.dev.txt
 include requirements.txt
+include tox.ini
+global-include *.json

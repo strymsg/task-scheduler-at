@@ -35,7 +35,7 @@ if __name__ == '__main__':
         maintainer_email='',
         keywords=['task_scheduler'],
         # package_dir={'': 'src'},
-        packages=find_packages(include=['task_scheduler', 'task_scheduler.*']),
+        packages=find_packages(include=['task_scheduler', 'task_scheduler.*', 'configs', 'tests']),
         zip_safe=False,
         classifiers=['Development Status :: 3 - Alpha',
                      'Intended Audience :: Developers',
