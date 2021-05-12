@@ -22,9 +22,9 @@ if __name__ == '__main__':
     setup(
         name='task_scheduler',
         description='Task Manager',
-        install_requires='requirements',
+        #install_requires='requirements',
         python_requires='>=3.5',
-        version="0.1.0",
+        #version="0.1.0",
         # long_description='\n\n'.join([readme, changes]),
         # license='MIT license',
         url='https://github.com/strymsg/task-scheduler-at',
