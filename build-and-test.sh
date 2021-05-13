@@ -10,7 +10,8 @@ then
     echo "$VENV exists on your filesystem."
     source $VENV/bin/activate
 else
-    virtualenv --python=python3 venv
+    python -m virtualenv --python=python3 venv
+    #virtualenv --python=python3 venv
 fi
 
 echo "Installing python requirements"
