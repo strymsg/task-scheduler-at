@@ -3,7 +3,8 @@
     "name": "task_scheduler",
     "username": "",
     "password": "",
-    "port": 27017
+    "port": 27017,
+    "host": "mongo"
   },
   "loglevel": "DEBUG",
   "secret_key": "some secret!"
