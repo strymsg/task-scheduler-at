@@ -1,9 +1,12 @@
 #!/bin/bash
 
+#TODO: Install virtualenv
+
 # Install requirements and preparing python environment
 VENV=venv
 
 echo "checking virtualenv..."
+
 
 if [[ -d "$VENV" ]]
 then

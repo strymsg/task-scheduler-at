@@ -94,3 +94,21 @@ tox
 ```bash
 bash build-and-test.sh
 ```
+
+### Running and building with Docker
+
+App and redis and mongo containers can be built by using docker-compose:
+
+```bash
+docker-compose up
+```
+
+Then at http://localhost:5000 app can be accessed
+
+Web flask app can also be built individually:
+
+```bash
+docker build -t task-scheduler-at-1 .
+docker run -it --rm --name task-scheduler-at-1 task-scheduler
+# then should run mongo and redis containers as well
+```
