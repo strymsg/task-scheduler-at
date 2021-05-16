@@ -12,14 +12,10 @@ services:
       - task-scheduler-at
   redis:
     image: redis
-    ports:
-      - "6379:6379"
     networks:
       - task-scheduler-at
   mongo:
     image: mongo
-    ports:
-      - "27017:27017"
     networks:
       - task-scheduler-at
 networks:

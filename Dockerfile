@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.9-slim-buster
 
 WORKDIR /usr/src/app
 
@@ -13,4 +13,5 @@ ENV FLASK_APP=main.py
 ENV FLASK_ENV=development
 
 CMD ["flask", "run", "--host=0.0.0.0"]
+
 
