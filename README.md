@@ -97,15 +97,32 @@ bash build-and-test.sh
 
 ### Running and building with Docker
 
+Be sure to modify config files first, rename `task-scheduler/configs/config.dev.sample.json`
+to `task-scheduler/configs/config.dev.json` and modify the configs if needed, for instance:
+
+```json
+{
+  "app_db": {
+    "name": "task_scheduler",
+    "username": "",
+    "password": "",
+    "port": 27017,
+    "host": "mongo"
+  },
+  "loglevel": "DEBUG",
+  "secret_key": "some secret dev!"
+}
+```
+
 App and redis and mongo containers can be built by using docker-compose:
 
 ```bash
 docker-compose up
 ```
 
-Then at http://localhost:5000 app can be accessed
+Then at `http://localhost:5000` app can be accessed
 
-Web flask app can also be built individually:
+Additionally, for testing purposes Web flask app can also be built individually:
 
 ```bash
 docker build -t task-scheduler-at-1 .
