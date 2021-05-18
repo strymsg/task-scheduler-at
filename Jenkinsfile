@@ -6,7 +6,7 @@ pipeline{
         stage("Building"){
             steps{
                 echo "========executing A========"
-                sh 'sudo apt-get install python3.8.5'
+                sh 'sudo apt-get install python3.8'
                 sh 'sudo apt-get install python3-pip'
                 sh 'sudo apt-get install python3-virtualenv'
                 sh 'virtualenv -p /usr/bin/python3 /home/ubuntu/jenkins_agent/workspace/first_pipeline_test/venv'
