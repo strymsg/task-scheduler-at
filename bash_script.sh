@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install python3.8
+sudo apt-get install python3.8.5
 sudo apt-get install python3-pip
 sudo apt-get install python3-virtualenv
 virtualenv -p /usr/bin/python3 ../venv
