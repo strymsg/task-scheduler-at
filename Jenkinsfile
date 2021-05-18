@@ -29,7 +29,6 @@ pipeline{
     post{
         success{
             echo "========pipeline executed successfully ========"
-            sh 'deactivate'
             sh 'sudo rm -rf /home/ubuntu/jenkins_agent/workspace/first_pipeline_test/venv'
         }
         failure{
