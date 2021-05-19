@@ -21,15 +21,23 @@ pipeline {
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
+                    pip3 install tox
                     pip3 install wheel
                     sudo apt-get -y install tox
                         
-                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${REQUIRED_REDIS}|grep "install ok installed")
-                    echo Checking for \${REQUIRED_REDIS}: \${PKG_OK}
+                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${PACKAGE_MONGO}|grep "install ok installed")
+                    echo Checking for \${PACKAGE_MONGO}: \${PKG_OK}
                     if [ "" = "\${PKG_OK}" ]; then
-                      echo "Not found: \${REQUIRED_REDIS}... Setting up \${REQUIRED_REDIS}."
-                      sudo apt-get --y install \${REQUIRED_REDIS} 
-                    fi """
+                        echo "Not found: \${PACKAGE_MONGO}... Setting up \${PACKAGE_MONGO}."
+                        sudo apt-get --y install \${PACKAGE_MONGO} 
+                    fi 
+
+                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${PACKAGE_REDIS}|grep "install ok installed")
+                    echo Checking for \${PACKAGE_REDIS}: \${PKG_OK}
+                    if [ "" = "\${PKG_OK}" ]; then
+                        echo "Not found: \${PACKAGE_REDIS}... Setting up \${PACKAGE_REDIS}."
+                        sudo apt-get --y install \${PACKAGE_REDIS} 
+                    fi  """
             }
         }
         stage('UnitTests') {
