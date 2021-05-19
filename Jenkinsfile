@@ -27,7 +27,7 @@ pipeline {
                 sudo apt-get -y install tox
                 
                 REQUIRED_MONGO=$PACKAGE_MONGO
-                PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_MONGO|grep "install ok installed")
+                PKG_OK=$\(dpkg-query -W --showformat="$\{Status\}\\n" $REQUIRED_MONGO|grep "install ok installed")
                 echo Checking for $REQUIRED_MONGO: $PKG_OK
                 if [ "" = "$PKG_OK" ]; then
                   echo "Not found: $REQUIRED_MONGO... Setting up $REQUIRED_MONGO."
