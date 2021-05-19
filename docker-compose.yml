@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - "${WORKSPACE}:${WORKSPACE}:rw"
+    networks:
+      - ts-at
+  redis:
+    image: redis
+    networks:
+      - ts-at
+  mongo:
+    image: mongo
+    networks:
+      - ts-at
+networks:
+  task-scheduler-at:
+    name: ts-at

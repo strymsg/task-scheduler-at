@@ -33,7 +33,7 @@ def init_db(app, db_configs):
         mongo_connection = MongoDbConnection(
             db_name=db_configs['name'],
             username=db_configs['username'],
-            db_host='localhost',
+            db_host=db_configs['host'],
             password=db_configs['password'],
             port=db_configs['port']
             )

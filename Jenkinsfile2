@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+
+    environment {
+        TEST_PREFIX = "test-IMAGE"
+        TEST_IMAGE = "${env.TEST_PREFIX}:${env.BUILD_NUMBER}"
+        TEST_CONTAINER = "${env.TEST_PREFIX}-${env.BUILD_NUMBER}"
+        REGISTRY_ADDRESS = "my.registry.address.com"
+        COMPOSE_FILE = "docker-compose.yml"
+    }
+
+    stages {
+        stage("Building") {
+            steps {
+                sh "docker-compose build"
+                sh "docker-compose up -d"
+            }
+        }
+    }
+}
