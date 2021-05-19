@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
+from task_scheduler.utils.constants import HOST_MONGO
 from unittest import TestCase
 import pytest
 import unittest
@@ -25,14 +26,14 @@ new_data = {
 cases = [
             MongoDbConnection(
                 db_name="dbtest1", 
-                db_host="localhost", 
+                db_host=HOST_MONGO,
                 username=None, 
                 password=None, 
                 port=27017),
 
             MongoDbConnection(
                 db_name="dbtest2", 
-                db_host="localhost", 
+                db_host=HOST_MONGO,
                 username=None, 
                 password=None, 
                 port=27017)

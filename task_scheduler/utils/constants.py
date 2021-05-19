@@ -1,3 +1,8 @@
+import os
+
+HOST_MONGO = os.getenv("MONGO_CONTAINER", "localhost")
+HOST_REDIS = os.getenv("REDIS_CONTAINER", "localhost")
+
 API_VERSION = '/api/v1'
 
 API_ROUTES = {
