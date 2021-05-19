@@ -14,33 +14,22 @@ pipeline {
     stages {
         stage("Prepare Environment") {
             steps {
-                sh """
-                
-                sudo apt-get update
-                sudo apt-get -y install python3.8
-                sudo apt-get -y install python3-pip
-                sudo apt-get -y install python3-virtualenv
-                python3 -m venv \$WORKSPACE/venv
-                source \$WORKSPACE/venv/bin/activate
-                pip3 install -r requirements.dev.txt'
-                pip3 install wheel'
-                sudo apt-get -y install tox
-                              
-                PKG_OK=$(dpkg-query -W --showformat=\'${Status}\\n\' $PACKAGE_MONGO|grep "install ok installed")
-                echo Checking for $PACKAGE_MONGO: $PKG_OK
-                if [ "" = "$PKG_OK" ]; then
-                  echo "No $PACKAGE_MONGO. Setting up $PACKAGE_MONGO."
-                  sudo apt-get --yes install $PACKAGE_MONGO 
-                fi
-                      
-                PKG_OK=\$(dpkg-query -W --showformat='\${Status}\n' \$REQUIRED_REDIS|grep "install ok installed")
-                echo Checking for \$REQUIRED_REDIS: \$PKG_OK
-                if [ "" = "\$PKG_OK" ]; then
-                  echo "Not found: \$REQUIRED_REDIS... Setting up \$REQUIRED_REDIS."
-                  sudo apt-get --y install \$REQUIRED_REDIS 
-                fi
-
-                """
+                sh """sudo apt-get update
+                    sudo apt-get -y install python3.8
+                    sudo apt-get -y install python3-pip
+                    sudo apt-get -y install python3-virtualenv
+                    python3 -m venv \$WORKSPACE/venv
+                    source \$WORKSPACE/venv/bin/activate
+                    pip3 install -r requirements.dev.txt'
+                    pip3 install wheel'
+                    sudo apt-get -y install tox
+                        
+                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${REQUIRED_REDIS}|grep "install ok installed")
+                    echo Checking for \${REQUIRED_REDIS}: \${PKG_OK}
+                    if [ "" = "\${PKG_OK}" ]; then
+                      echo "Not found: \${REQUIRED_REDIS}... Setting up \${REQUIRED_REDIS}."
+                      sudo apt-get --y install \${REQUIRED_REDIS} 
+                    fi """
             }
         }
         stage('UnitTests') {
