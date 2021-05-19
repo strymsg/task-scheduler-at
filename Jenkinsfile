@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage("Prepare") {
             steps {
-                bitbucketStatusNotify buildState: "INPROGRESS"
+                echo "INPROGRESS"
             }
         }
         stage('Building') {
@@ -38,10 +38,10 @@ pipeline {
           sh "docker-compose down || true"
       }
       success {
-          bitbucketStatusNotify buildState: "SUCCESSFUL"
+          echo "SUCCESSFUL"
       }
       failure {
-          bitbucketStatusNotify buildState: "FAILED"
+          echo "FAILED"
       }
 }
 }
