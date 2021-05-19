@@ -32,8 +32,8 @@ pipeline {
     }
       post {
       always {
-          echo "DONE!!!
-          echo "docker-compose down || true"
+          echo "DONE!!!"
+          // sh "docker-compose down || true"
       }
     }
 }
