@@ -26,20 +26,20 @@ pipeline {
                 pip3 install wheel'
                 sudo apt-get -y install tox
                 
-                REQUIRED_MONGO=$PACKAGE_MONGO
-                PKG_OK=$\(dpkg-query -W --showformat="$\{Status\}\\n" $REQUIRED_MONGO|grep "install ok installed")
-                echo Checking for $REQUIRED_MONGO: $PKG_OK
-                if [ "" = "$PKG_OK" ]; then
-                  echo "Not found: $REQUIRED_MONGO... Setting up $REQUIRED_MONGO."
-                  sudo apt-get --y install $REQUIRED_MONGO 
+                REQUIRED_MONGO=\$PACKAGE_MONGO
+                PKG_OK=\$(dpkg-query -W --showformat="\${Status}\n" \$REQUIRED_MONGO|grep "install ok installed")
+                echo Checking for $REQUIRED_MONGO: \$PKG_OK
+                if [ "" = "\$PKG_OK" ]; then
+                  echo "Not found: \$REQUIRED_MONGO... Setting up \$REQUIRED_MONGO."
+                  sudo apt-get --y install \$REQUIRED_MONGO 
                 fi
                 
-                REQUIRED_REDIS=$PACKAGE_REDIS
-                PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_REDIS|grep "install ok installed")
-                echo Checking for $REQUIRED_REDIS: $PKG_OK
-                if [ "" = "$PKG_OK" ]; then
-                  echo "Not found: $REQUIRED_REDIS... Setting up $REQUIRED_REDIS."
-                  sudo apt-get --y install $REQUIRED_REDIS 
+                REQUIRED_REDIS=\$PACKAGE_REDIS
+                PKG_OK=\$(dpkg-query -W --showformat='\${Status}\n' \$REQUIRED_REDIS|grep "install ok installed")
+                echo Checking for \$REQUIRED_REDIS: \$PKG_OK
+                if [ "" = "\$PKG_OK" ]; then
+                  echo "Not found: \$REQUIRED_REDIS... Setting up \$REQUIRED_REDIS."
+                  sudo apt-get --y install \$REQUIRED_REDIS 
                 fi
 
                 """
