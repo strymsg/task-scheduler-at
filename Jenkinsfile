@@ -67,8 +67,9 @@ pipeline {
                 echo 'Hello, Here will be tests and they will run with tox'
             }
         }
-    }
     */
+    }
+    
     post {
         always {
             echo "DONE!!!"
