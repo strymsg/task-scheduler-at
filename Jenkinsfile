@@ -26,7 +26,7 @@ pipeline {
                 pip3 install wheel'
                 sudo apt-get -y install tox
                 
-                REQUIRED_MONGO=${env.PACKAGE_MONGO}
+                REQUIRED_MONGO=${PACKAGE_MONGO}
                 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_MONGO|grep "install ok installed")
                 echo Checking for $REQUIRED_MONGO: $PKG_OK
                 if [ "" = "$PKG_OK" ]; then
@@ -34,7 +34,7 @@ pipeline {
                   sudo apt-get --y install $REQUIRED_MONGO 
                 fi
                 
-                REQUIRED_REDIS=${env.PACKAGE_REDIS}
+                REQUIRED_REDIS=${PACKAGE_REDIS}
                 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_REDIS|grep "install ok installed")
                 echo Checking for $REQUIRED_REDIS: $PKG_OK
                 if [ "" = "$PKG_OK" ]; then
