@@ -1,5 +1,14 @@
 pipeline {
+    
     agent {label 'agent-eg'}
+    
+    environment {
+        BUILD_NUMBER = "0.9"
+        PROJECT_PREFIX = "TASK-SCHED"
+        PROJECT_IMAGE = "${env.PROJECT_PREFIX}:${env.BUILD_NUMBER}"
+        PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${env.BUILD_NUMBER}"
+    }
+    
     stages {
         stage("Prepare") {
             steps {
@@ -18,6 +27,9 @@ pipeline {
         stage('Example Test') {
             steps {
                 echo 'Hello, Here will be tests and they will run with tox'
+                sh """
+                
+                """
             }
         }
     }
