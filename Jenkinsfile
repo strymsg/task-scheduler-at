@@ -1,38 +1,46 @@
-pipeline{
-    agent{
-        label "agent-eg"
-    }
-    stages{
-        stage("Building"){
-            steps{
-                echo "========executing A========"
-                sh 'sudo apt-get -y install python3.8'
-                sh 'sudo apt-get -y install python3-pip'
-                sh 'sudo apt-get -y install python3-virtualenv'
-                sh 'python3 -m venv /home/ubuntu/jenkins_agent/workspace/first_pipeline_test/venv'
-                sh 'source /home/ubuntu/jenkins_agent/workspace/first_pipeline_test/venv/bin/activate'
-                sh 'pip3 install -r requirements.dev.txt'
-                sh 'pip3 install wheel'
-                sh 'sudo apt-get -y install tox'
-                sh 'python3 setup.py sdist bdist_wheel'
-            }
-            post{
-                success{
-                    echo "==\"BUILDING\" executed successfully=="
-                }
-                failure{
-                    echo "==\"BUILDING\" executed failed=="
+pipeline {
+    agent none
+    stages {
+        stage('App'){
+            agent {
+                dockerfile {
+                    filename 'Dockerfile'
+                    args  '-v ${env.WORKSPACE}:${env.WORKSPACE}:rw'
                 }
             }
+            steps {
+                echo "APP - created"
+            }
         }
-    }
-    post{
-        success{
-            echo "========pipeline executed successfully ========"
-            sh 'sudo rm -rf /home/ubuntu/jenkins_agent/workspace/first_pipeline_test/venv'
+        stage('Redis') {
+            agent {
+                docker {
+                    image 'redis:latest'
+                    args """
+                    --name redisdbat
+                    -v /docker/redisdb/datadir:/data
+                    """
+                }
+            }
+            steps {
+                echo "REDIS - created"
+            }
         }
-        failure{
-            echo "========pipeline execution failed========"
+        stage('Mongo') {
+            agent {
+                docker {
+                    image 'mongo:latest'
+                    args """
+                    --name mongodbat
+                    -e MONGO_INITDB_ROOT_USERNAME= \
+                    -e MONGO_INITDB_ROOT_PASSWORD= \
+                    -v /docker/mongodb/datadir:/data/db
+                    """
+                }
+            }
+            steps {
+                echo "MONGO - created"
+            }
         }
     }
 }
