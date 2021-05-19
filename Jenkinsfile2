@@ -1,41 +1,9 @@
 pipeline {
-    environment {
-        TEST_PREFIX = "test-IMAGE"
-        TEST_IMAGE = "${env.TEST_PREFIX}:${env.BUILD_NUMBER}"
-        TEST_CONTAINER = "${env.TEST_PREFIX}-${env.BUILD_NUMBER}"
-        REGISTRY_ADDRESS = "my.registry.address.com"
-        COMPOSE_FILE = "docker-compose.yml"
-    }
-
-    agent {
-        dockerfile {
-            filename 'Dockerfile'
-            label 'app-at'
-            args  '-v ${env.WORKSPACE}:${env.WORKSPACE}:rw'
-        }
-    }
-    agent {
-        docker {
-            image 'redis:latest'
-            label 'redisdb-at'
-            args  '-v /docker/redisdb/datadir:/data'
-        }
-    }
-    agent {
-        docker {
-            image 'mongo:latest'
-            label 'redisdb-at'
-            args  """
-                -e MONGO_INITDB_ROOT_USERNAME= \
-                -e MONGO_INITDB_ROOT_PASSWORD= \
-                -v /docker/mongodb/datadir:/data/db
-                """
-        }
-    }
-
+    
     stages {
         stage("Building") {
             steps {
+                sh ‘docker-compose up -d’
                 echo "CREATED"
             }
         }
