@@ -27,9 +27,6 @@ pipeline {
         stage('Example Test') {
             steps {
                 echo 'Hello, Here will be tests and they will run with tox'
-                sh """
-                
-                """
             }
         }
     }
@@ -37,11 +34,5 @@ pipeline {
       always {
           sh "docker-compose down || true"
       }
-      success {
-          echo "SUCCESSFUL"
-      }
-      failure {
-          echo "FAILED"
-      }
-}
+    }
 }
