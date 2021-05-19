@@ -5,7 +5,6 @@ pipeline {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
-                    args  '-v ${env.WORKSPACE}:${env.WORKSPACE}:rw'
                 }
             }
             steps {
