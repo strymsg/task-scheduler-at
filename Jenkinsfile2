@@ -12,8 +12,22 @@ pipeline {
     stages {
         stage("Building") {
             steps {
-                sh "docker-compose build"
-                sh "docker-compose up -d"
+                sh """
+                docker network create --attachable tk-at
+
+                docker build -t app-at Dockerfile
+                docker run -d --name app-at --network tk-at app-at
+
+                docker run --name redisdb-at --network tk-at -d \
+                -v /docker/redisdb/datadir:/data \
+                redis:latest
+
+                docker run -d --network tk-at --name mongodb-at \
+                -e MONGO_INITDB_ROOT_USERNAME= \
+                -e MONGO_INITDB_ROOT_PASSWORD= \
+                -v /docker/mongodb/datadir:/data/db \
+                mongo:latest
+                """
             }
         }
     }
