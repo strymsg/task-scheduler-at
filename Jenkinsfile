@@ -44,3 +44,4 @@ pipeline {
           bitbucketStatusNotify buildState: "FAILED"
       }
 }
+}
