@@ -1,45 +1,34 @@
 pipeline {
-    agent none
+    agent {label 'agent-eg'}
     stages {
-        stage('App'){
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                }
-            }
+        stage("Prepare") {
             steps {
-                echo "APP - created"
+                bitbucketStatusNotify buildState: "INPROGRESS"
             }
         }
-        stage('Redis') {
-            agent {
-                docker {
-                    image 'redis:latest'
-                    args """
-                    --name redisdbat
-                    -v /docker/redisdb/datadir:/data
-                    """
-                }
-            }
+        stage('Building') {
             steps {
-                echo "REDIS - created"
+                // sh 'docker build -t test_test_test .'
+                sh """
+                docker-compose build
+                docker-compose up -d
+                """
             }
         }
-        stage('Mongo') {
-            agent {
-                docker {
-                    image 'mongo:latest'
-                    args """
-                    --name mongodbat
-                    -e MONGO_INITDB_ROOT_USERNAME= \
-                    -e MONGO_INITDB_ROOT_PASSWORD= \
-                    -v /docker/mongodb/datadir:/data/db
-                    """
-                }
-            }
+        stage('Example Test') {
             steps {
-                echo "MONGO - created"
+                echo 'Hello, Here will be tests and they will run with tox'
             }
         }
     }
+      post {
+      always {
+          sh "docker-compose down || true"
+      }
+      success {
+          bitbucketStatusNotify buildState: "SUCCESSFUL"
+      }
+      failure {
+          bitbucketStatusNotify buildState: "FAILED"
+      }
 }
