@@ -2,8 +2,6 @@ version: "3.9"
 services:
   web:
     build: .
-    ports:
-      - "5000:5000"
     networks:
       - ts-at
   redis:
