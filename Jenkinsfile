@@ -47,10 +47,22 @@ pipeline {
             }
         }
         
-        stage('Static code analysis') {
-            steps{
-                echo "Here will be Sonar..."
-            }
+         stage('Static code analysis') {
+            steps {
+                script {
+                    // SonarQube Scanner Installation name = sonarqube-scanner-at
+                    // Get the directory path where SonarQube Scanner
+                    def scannerHome = tool 'sonarqube-scanner-at'
+                    // SonarQube Server name = sonarqube-automation
+                    withSonarQubeEnv('sonarqube-automation') {
+                    // Set parameters to the sonar-scanner binary and run it
+                        sh """${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectName=$PROJECT_PREFIX \
+                        -Dsonar.projectKey=$PROJECT_PREFIX \
+                        -Dsonar.sources=."""
+                    }
+                }
+             }
         }
         
         stage("Building with Docker") {
