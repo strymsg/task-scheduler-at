@@ -3,16 +3,15 @@ services:
   web:
     build: .
     container_name: APP_${PROJECT_CONTAINER}
-    networks:
-      - ts-at
+    volumes:
+      - .:/app
+
   redis:
+    container_name: REDIS_${PROJECT_CONTAINER}
     image: redis
-    networks:
-      - ts-at
+
   mongo:
+    container_name: MONGO_${PROJECT_CONTAINER}
     image: mongo
-    networks:
-      - ts-at
-networks:
-  task-scheduler-at:
-    name: ts-at
+
+
