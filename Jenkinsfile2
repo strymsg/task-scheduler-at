@@ -1,6 +1,4 @@
 pipeline {
-    agent any
-
     environment {
         TEST_PREFIX = "test-IMAGE"
         TEST_IMAGE = "${env.TEST_PREFIX}:${env.BUILD_NUMBER}"
@@ -9,25 +7,36 @@ pipeline {
         COMPOSE_FILE = "docker-compose.yml"
     }
 
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            label 'app-at'
+            args  '-v ${env.WORKSPACE}:${env.WORKSPACE}:rw'
+        }
+    }
+    agent {
+        docker {
+            image 'redis:latest'
+            label 'redisdb-at'
+            args  '-v /docker/redisdb/datadir:/data'
+        }
+    }
+    agent {
+        docker {
+            image 'mongo:latest'
+            label 'redisdb-at'
+            args  """
+                -e MONGO_INITDB_ROOT_USERNAME= \
+                -e MONGO_INITDB_ROOT_PASSWORD= \
+                -v /docker/mongodb/datadir:/data/db
+                """
+        }
+    }
+
     stages {
         stage("Building") {
             steps {
-                sh """
-                docker network create --attachable tk-at
-
-                docker build -t app-at Dockerfile
-                docker run -d --name app-at --network tk-at app-at
-
-                docker run --name redisdb-at --network tk-at -d \
-                -v /docker/redisdb/datadir:/data \
-                redis:latest
-
-                docker run -d --network tk-at --name mongodb-at \
-                -e MONGO_INITDB_ROOT_USERNAME= \
-                -e MONGO_INITDB_ROOT_PASSWORD= \
-                -v /docker/mongodb/datadir:/data/db \
-                mongo:latest
-                """
+                echo "CREATED"
             }
         }
     }
