@@ -4,7 +4,10 @@ services:
     build: .
     container_name: APP_${PROJECT_CONTAINER}
     volumes:
-      - .:/app
+      - .:/usr/src/app
+    depends_on:
+      - redis
+      - mongo
 
   redis:
     container_name: REDIS_${PROJECT_CONTAINER}
