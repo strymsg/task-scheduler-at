@@ -42,27 +42,31 @@ pipeline {
         }
         stage('UnitTests') {
             steps {
-                sh "tox -vvv"
+                sh """source \$WORKSPACE/venv/bin/activate
+                      tox -vvv """
             }
         }
         
-        /*
+        stage('Static code analysis') {
+            steps{
+                echo "Here will be Sonar..."
+            }
+        }
         
-        stage('Building') {
+        stage("Building with Docker") {
             steps {
                 // sh 'docker build -t test_test_test .'
                 sh """
-                docker-compose build
-                docker-compose up -d
-                """
+                docker-compose build """
+                // sh "docker-compose up -d"
             }
         }
-        stage('Example Test') {
+        stage('Promote Image') {
             steps {
-                echo 'Hello, Here will be tests and they will run with tox'
+                echo 'Here will be NEXUS...'
             }
         }
-    */
+    
     }
     
     post {
