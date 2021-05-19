@@ -7,15 +7,20 @@ services:
     volumes:
       - ".:/code"
     networks:
-      - task-scheduler-at
+      - jenkins
+      #- task-scheduler-at
   redis:
     image: redis
     networks:
-      - task-scheduler-at
+      - jenkins
+      #- task-scheduler-at
   mongo:
     image: mongo
     networks:
-      - task-scheduler-at
+      - jenkins
+      #- task-scheduler-at
 networks:
-  task-scheduler-at:
-    name: task-scheduler-at
+  #task-scheduler-at:
+  #  name: task-scheduler-at
+  jenkins:
+    name: jenkins

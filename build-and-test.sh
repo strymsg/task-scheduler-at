@@ -1,12 +1,16 @@
 #!/bin/bash
 
-#TODO: Install virtualenv
-
 # Install requirements and preparing python environment
 VENV=venv
 
 echo "checking virtualenv..."
-
+if ! virtualenv -v COMMAND &> /dev/null
+then
+    echo
+    echo "Need to have virtualenv to install requirements"
+    echo "use: apt install virtualenv python3-virtualenv"
+    exit 1
+fi
 
 if [[ -d "$VENV" ]]
 then
@@ -24,7 +28,16 @@ echo "-------------------------------------"
 echo "Running tests"
 echo "-------------------------------------"
 
-coverage -m pytest
+# checking docker for databases
+if ! docker -v COMMAND &> /dev/null
+then
+    echo
+    echo "Need docker to be installed for completing tests"
+    echo "Need mongo and redis container running"
+    echo "Warning, tests will not finish successfully"
+fi
+
+coverage run -m pytest
 echo "-------------------------------------"
 echo "Coverage report"
 echo "-------------------------------------"
@@ -41,6 +54,8 @@ then
   echo ""
   rm -rf dist
 fi
+
+pip3 install build
 
 python3 -m build
 
@@ -61,5 +76,3 @@ export FLASK_APP=main.py
 export FLASK_ENV=development
 
 flask run
-
-
