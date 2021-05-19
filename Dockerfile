@@ -11,3 +11,7 @@ RUN pip3 install wheel
 COPY . .
 RUN ["python","setup.py","sdist","bdist_wheel"]
 
+ENV FLASK_APP=main.py
+ENV FLASK_ENV=development
+CMD ["flask", "run", "--host=0.0.0.0"]
+
