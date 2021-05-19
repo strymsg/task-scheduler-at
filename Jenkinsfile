@@ -20,8 +20,8 @@ pipeline {
                 sudo apt-get -y install python3.8
                 sudo apt-get -y install python3-pip
                 sudo apt-get -y install python3-virtualenv
-                python3 -m venv $WORKSPACE/venv
-                source $WORKSPACE/venv/bin/activate
+                python3 -m venv \$WORKSPACE/venv
+                source \$WORKSPACE/venv/bin/activate
                 pip3 install -r requirements.dev.txt'
                 pip3 install wheel'
                 sudo apt-get -y install tox
