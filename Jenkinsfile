@@ -20,8 +20,8 @@ pipeline {
                     sudo apt-get -y install python3-virtualenv
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
-                    pip3 install -r requirements.dev.txt'
-                    pip3 install wheel'
+                    pip3 install -r requirements.dev.txt
+                    pip3 install wheel
                     sudo apt-get -y install tox
                         
                     PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${REQUIRED_REDIS}|grep "install ok installed")
