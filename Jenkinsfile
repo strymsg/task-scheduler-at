@@ -7,14 +7,52 @@ pipeline {
         PROJECT_PREFIX = "TASK-SCHED"
         PROJECT_IMAGE = "${env.PROJECT_PREFIX}:${env.BUILD_NUMBER}"
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${env.BUILD_NUMBER}"
+        PACKAGE_MONGO = "mongodb"
+        PACKAGE_REDIS = "redis-server"
     }
     
     stages {
-        stage("Prepare") {
+        stage("Prepare Environment") {
             steps {
-                echo "INPROGRESS"
+                sh """
+                
+                sudo apt-get update
+                sudo apt-get -y install python3.8
+                sudo apt-get -y install python3-pip
+                sudo apt-get -y install python3-virtualenv
+                python3 -m venv $WORKSPACE/venv
+                source $WORKSPACE/venv/bin/activate
+                pip3 install -r requirements.dev.txt'
+                pip3 install wheel'
+                sudo apt-get -y install tox
+                
+                REQUIRED_MONGO=${env.PACKAGE_MONGO}
+                PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_MONGO|grep "install ok installed")
+                echo Checking for $REQUIRED_MONGO: $PKG_OK
+                if [ "" = "$PKG_OK" ]; then
+                  echo "Not found: $REQUIRED_MONGO... Setting up $REQUIRED_MONGO."
+                  sudo apt-get --y install $REQUIRED_MONGO 
+                fi
+                
+                REQUIRED_REDIS=${env.PACKAGE_REDIS}
+                PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_REDIS|grep "install ok installed")
+                echo Checking for $REQUIRED_REDIS: $PKG_OK
+                if [ "" = "$PKG_OK" ]; then
+                  echo "Not found: $REQUIRED_REDIS... Setting up $REQUIRED_REDIS."
+                  sudo apt-get --y install $REQUIRED_REDIS 
+                fi
+
+                """
             }
         }
+        stage('UnitTests') {
+            steps {
+                sh "tox -vvv"
+            }
+        }
+        
+        /*
+        
         stage('Building') {
             steps {
                 // sh 'docker build -t test_test_test .'
@@ -30,10 +68,11 @@ pipeline {
             }
         }
     }
-      post {
-      always {
-          echo "DONE!!!"
-          // sh "docker-compose down || true"
-      }
-    }
+    */
+    post {
+        always {
+            echo "DONE!!!"
+            // sh "docker-compose down || true"
+            }
+        }
 }
