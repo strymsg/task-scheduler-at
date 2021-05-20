@@ -9,5 +9,15 @@ __pycache__/
 # C extensions
 *.so
 
+.idea folder
+.github folder
+.gitignore
+Dockerfile
+docker-compose.yml
+.dockerigrnore
+*.log
+.coveragerc
+.pylintrc
 
-
+etc.
+Review with other files are not needed in your Container Image, once you identified, added to this file and push your changes.
