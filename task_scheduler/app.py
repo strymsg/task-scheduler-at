@@ -14,7 +14,7 @@ from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoin
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.endpoints.db_task_endpoint \
                             import DbTaskEndpoint
-from task_scheduler.utils.constants import API_ROUTES
+from task_scheduler.utils.constants import API_ROUTES, HOST_MONGO
 
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 
