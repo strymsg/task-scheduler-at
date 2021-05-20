@@ -4,11 +4,13 @@ pipeline {
 
     environment {
         BUILD_NUMBER = "0.9"
-        PROJECT_PREFIX = "TASK-SCHED"
-        PROJECT_IMAGE = "${env.PROJECT_PREFIX}:${env.BUILD_NUMBER}"
+        IMAGE_NAME = "app-task-scheduler:${env.BUILD_NUMBER}"
+        PROM_IMAGE_NAME = "app-task-scheduler"
+        PROJECT_PREFIX = "APP-TASK-SCHEDULER"
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${env.BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
+        NEXUS_IP_PORT = "10.28.108.180:8123"
     }
 
     stages {
@@ -73,11 +75,25 @@ pipeline {
                 // sh "docker-compose up -d"
             }
         }
+        
         stage('Promote Image') {
-            steps {
-                echo 'Here will be NEXUS...'
+            steps{
+                script {
+                        withCredentials([usernamePassword(
+                          credentialsId: 'nexus_eg_credentials',
+                          usernameVariable: 'USERNAME',
+                          passwordVariable: 'PASSWORD'
+                        )]) {
+
+                          sh """
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker tag \${IMAGE_NAME} \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:latest
+                            docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:latest
+                          """
+                        }
+                    }
+                }
             }
-        }
 
     }
 
