@@ -10,7 +10,7 @@ pipeline {
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${env.BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
-        NEXUS_IP_PORT = "10.28.108.154:8081"
+        NEXUS_IP_PORT = "10.28.108.154:8082"
     }
 
     stages {
