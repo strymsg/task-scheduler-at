@@ -4,11 +4,10 @@ pipeline {
     agent {label 'jenkins-agent-01'}
 
     environment {
-        BUILD_NUMBER = "0.9"
-        IMAGE_NAME = "app-task-scheduler:${env.BUILD_NUMBER}"
+        IMAGE_NAME = "app-task-scheduler:${BUILD_NUMBER}"
         PROM_IMAGE_NAME = "app-task-scheduler"
         PROJECT_PREFIX = "APP-TASK-SCHEDULER"
-        PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${env.BUILD_NUMBER}"
+        PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
         NEXUS_IP_PORT = "10.28.108.154:8082"
@@ -17,30 +16,19 @@ pipeline {
     stages {
         stage("Prepare Environment") {
             steps {
-                sh """sudo apt-get update
-                    sudo apt-get -y install python3.7 && python3-pip python3-virtualenv \
-                         && tox
+                sh """
+                    sudo apt-get update &&  sudo apt-get -y install python3.7 && sudo apt-get -y install python3-pip \
+                        && sudo apt-get -y install python3-virtualenv && sudo apt-get -y install \${PACKAGE_MONGO} \
+                        && sudo apt-get -y install \${PACKAGE_REDIS} && sudo apt-get -y install tox
+                    
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
                     pip3 install tox
-                    pip3 install wheel
-
-                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${PACKAGE_MONGO}|grep "install ok installed")
-                    echo Checking for \${PACKAGE_MONGO}: \${PKG_OK}
-                    if [ "" = "\${PKG_OK}" ]; then
-                        echo "Not found: \${PACKAGE_MONGO}... Setting up \${PACKAGE_MONGO}."
-                        sudo apt-get --y install \${PACKAGE_MONGO}
-                    fi
-
-                    PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${PACKAGE_REDIS}|grep "install ok installed")
-                    echo Checking for \${PACKAGE_REDIS}: \${PKG_OK}
-                    if [ "" = "\${PKG_OK}" ]; then
-                        echo "Not found: \${PACKAGE_REDIS}... Setting up \${PACKAGE_REDIS}."
-                        sudo apt-get --y install \${PACKAGE_REDIS}
-                    fi  """
+                    pip3 install wheel"""
             }
         }
+        
         stage('UnitTests') {
             steps {
                 sh """source \$WORKSPACE/venv/bin/activate
@@ -68,10 +56,16 @@ pipeline {
 
         stage("Building with Docker") {
             steps {
-                // sh 'docker build -t test_test_test .'
                 sh """
                 docker-compose build """
                 // sh "docker-compose up -d"
+            }
+            post {
+                failure {
+                    script {
+                        sh "docker rmi \$(docker images --filter dangling=true -q)"
+                    }
+                }
             }
         }
         
@@ -86,14 +80,21 @@ pipeline {
 
                           sh """
                             docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker tag \${IMAGE_NAME} \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:latest
-                            docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:latest
+                            docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}
                           """
                         }
                     }
                 }
+    
+            post {
+                always {
+                    script {
+                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}"
+                        sh "docker logout \${NEXUS_IP_PORT}"
+                    }
+                }
             }
-
+        }
     }
 
     post {
