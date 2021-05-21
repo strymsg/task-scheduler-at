@@ -101,8 +101,10 @@ pipeline {
 
     post {
         always {
-            echo "DONE!!!"
-            // sh "docker-compose down || true"
-            }
+            emailext body: """Hi Devs!\n\nJenkins reporting: Pipeline execution finished\n\nStatus: \"${currentBuild.currentResult}\"\nJob: ${env.JOB_NAME}\nBuild: ${env.BUILD_NUMBER}\nURL to more info at: ${env.BUILD_URL}""",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
+            subject: "${currentBuild.currentResult}: Jenkins Build (${env.BUILD_NUMBER}) Notification for Job: ${env.JOB_NAME}",
+            to: '$DEFAULT_RECIPIENTS'
         }
+    }
 }
