@@ -18,8 +18,10 @@ pipeline {
             steps {
                 sh """
                     sudo apt-get update &&  sudo apt-get -y install python3.7 && sudo apt-get -y install python3-pip \
-                        && sudo apt-get -y install python3-virtualenv && sudo apt-get -y install \${PACKAGE_MONGO} \
+                        && sudo apt-get -y install python3-venv && sudo apt-get -y install \${PACKAGE_MONGO} \
                         && sudo apt-get -y install \${PACKAGE_REDIS} && sudo apt-get -y install tox
+
+                    sudo service mongodb start && sudo service redis-server start
                     
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
