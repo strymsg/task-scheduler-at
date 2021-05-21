@@ -1,3 +1,8 @@
+import os
+
+HOST_MONGO = os.getenv("MONGO_CONTAINER", "localhost")
+HOST_REDIS = os.getenv("REDIS_CONTAINER", "localhost")
+
 API_VERSION = '/api/v1'
 
 API_ROUTES = {
@@ -22,7 +27,7 @@ API_ROUTES = {
 #     "config": "config_287575eb-48e5-4598-83f9-d1aeb090effc",
 #   }
 # )
-
+#
 # db.getCollection('tasks').insert(
 #   {
 #     "task_id": "task_Api-request_63f1bd71-f441-4519-8a41-33943ccb4dad",

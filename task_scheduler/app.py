@@ -14,7 +14,7 @@ from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoin
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.endpoints.db_task_endpoint \
                             import DbTaskEndpoint
-from task_scheduler.utils.constants import API_ROUTES
+from task_scheduler.utils.constants import API_ROUTES, HOST_MONGO
 
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
 
@@ -33,12 +33,14 @@ def init_db(app, db_configs):
         mongo_connection = MongoDbConnection(
             db_name=db_configs['name'],
             username=db_configs['username'],
-            db_host='localhost',
+            db_host=db_configs['host'],
             password=db_configs['password'],
             port=db_configs['port']
             )
         g.db = mongo_connection
         app.mongo_connection = mongo_connection
+        print("Configs::::::")
+        print(db_configs)
     return g.db
 
 

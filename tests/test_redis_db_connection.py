@@ -1,6 +1,7 @@
 from redis import Redis
 from task_scheduler.tasks.abstract_db_connector import RedisDbConnection
 from task_scheduler.utils.exceptions import DbErrorHandler
+from task_scheduler.utils.constants import HOST_REDIS
 from unittest import TestCase
 import pytest
 import unittest
@@ -26,14 +27,14 @@ new_data = {
 cases = [
     RedisDbConnection(
         db_name="0",
-        db_host="localhost",
+        db_host=HOST_REDIS,
         username=None,
         password=None,
         port=6379),
 
     RedisDbConnection(
         db_name="1",
-        db_host="localhost",
+        db_host=HOST_REDIS,
         username=None,
         password=None,
         port=6379)
