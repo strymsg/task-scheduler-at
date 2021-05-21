@@ -3,7 +3,7 @@ services:
   web:
     build: .
     container_name: ${PROJECT_CONTAINER}
-    image: ${IMAGE_NAME}
+    image: ${NEXUS_IP_PORT}/${PROM_IMAGE_NAME}:${BUILD_NUMBER}
     volumes:
       - .:/usr/src/app
     depends_on:
