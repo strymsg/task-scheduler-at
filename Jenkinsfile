@@ -1,7 +1,7 @@
 pipeline {
 
-    // agent {label 'agent-eg'}
-    agent {label 'jenkins-agent-01'}
+    agent {label 'agent-eg'}
+    //agent {label 'jenkins-agent-01'}
 
     environment {
         IMAGE_NAME = "app-task-scheduler:${BUILD_NUMBER}"
@@ -10,7 +10,7 @@ pipeline {
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
-        NEXUS_IP_PORT = "10.28.108.154:8082"
+        NEXUS_IP_PORT = "10.28.108.154:8083"
     }
 
     stages {
