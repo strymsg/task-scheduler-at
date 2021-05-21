@@ -10,7 +10,7 @@ pipeline {
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
-        NEXUS_IP_PORT = "10.28.108.154:8083"
+        NEXUS_IP_PORT = "10.28.108.180:8123"
     }
 
     stages {
@@ -75,7 +75,7 @@ pipeline {
             steps{
                 script {
                         withCredentials([usernamePassword(
-                          credentialsId: 'sonatype-nexus-at-rodrigo',
+                          credentialsId: 'nexus_eg_credentials',
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
