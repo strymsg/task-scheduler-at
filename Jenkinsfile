@@ -1,7 +1,7 @@
 pipeline {
 
-    // agent {label 'agent-eg'}
-    agent {label 'jenkins-agent-01'}
+    agent {label 'agent-eg'}
+    //agent {label 'jenkins-agent-01'}
 
     environment {
         IMAGE_NAME = "app-task-scheduler:${BUILD_NUMBER}"
@@ -10,7 +10,7 @@ pipeline {
         PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${BUILD_NUMBER}"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
-        NEXUS_IP_PORT = "10.28.108.154:8082"
+        NEXUS_IP_PORT = "10.28.108.180:8123"
     }
 
     stages {
@@ -75,7 +75,7 @@ pipeline {
             steps{
                 script {
                         withCredentials([usernamePassword(
-                          credentialsId: 'sonatype-nexus-at-rodrigo',
+                          credentialsId: 'nexus_eg_credentials',
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
@@ -101,8 +101,10 @@ pipeline {
 
     post {
         always {
-            echo "DONE!!!"
-            // sh "docker-compose down || true"
-            }
+            emailext body: """Hi Devs!\n\nJenkins reporting: Pipeline execution finished\n\nStatus: \"${currentBuild.currentResult}\"\nJob: ${env.JOB_NAME}\nBuild: ${env.BUILD_NUMBER}\nURL to more info at: ${env.BUILD_URL}""",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
+            subject: "${currentBuild.currentResult}: Jenkins Build (${env.BUILD_NUMBER}) Notification for Job: ${env.JOB_NAME}",
+            to: '$DEFAULT_RECIPIENTS'
         }
+    }
 }
