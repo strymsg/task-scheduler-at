@@ -1,6 +1,7 @@
 pipeline {
 
-    agent {label 'agent-eg'}
+    // agent {label 'agent-eg'}
+    agent {label 'jenkins-agent-01'}
 
     environment {
         BUILD_NUMBER = "0.9"
