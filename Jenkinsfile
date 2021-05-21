@@ -18,15 +18,13 @@ pipeline {
         stage("Prepare Environment") {
             steps {
                 sh """sudo apt-get update
-                    sudo apt-get -y install python3.8
-                    sudo apt-get -y install python3-pip
-                    sudo apt-get -y install python3-virtualenv
+                    sudo apt-get -y install python3.7 && python3-pip python3-virtualenv \
+                         && tox
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
                     pip3 install tox
                     pip3 install wheel
-                    sudo apt-get -y install tox
 
                     PKG_OK=\$(dpkg-query -W --showformat='\${Status}\\n' \${PACKAGE_MONGO}|grep "install ok installed")
                     echo Checking for \${PACKAGE_MONGO}: \${PKG_OK}
