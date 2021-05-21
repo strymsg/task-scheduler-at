@@ -59,18 +59,18 @@ pipeline {
         stage("Building with Docker") {
             steps {
                 sh """
-                sudo docker-compose build """
+                docker-compose build """
                 // sh "docker-compose up -d"
             }
             post {
                 failure {
                     script {
-                        sh "sudo docker rmi \$(docker images --filter dangling=true -q)"
+                        sh "docker rmi \$(docker images --filter dangling=true -q)"
                     }
                 }
             }
         }
-
+        
         stage('Promote Image') {
             steps{
                 script {
@@ -81,18 +81,18 @@ pipeline {
                         )]) {
 
                           sh """
-                            sudo docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            sudo docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}
                           """
                         }
                     }
                 }
-
+    
             post {
                 always {
                     script {
-                        sh "sudo docker rmi -f \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}"
-                        sh "sudo docker logout \${NEXUS_IP_PORT}"
+                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}"
+                        sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
