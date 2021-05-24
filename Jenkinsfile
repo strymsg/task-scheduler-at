@@ -2,6 +2,7 @@ pipeline {
 
     agent {label 'agent-eg'}
     //agent {label 'jenkins-agent-01'}
+    //
 
     environment {
         IMAGE_NAME = "app-task-scheduler:${BUILD_NUMBER}"
