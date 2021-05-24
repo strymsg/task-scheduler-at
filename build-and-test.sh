@@ -6,7 +6,7 @@ VENV=venv
 echo "checking virtualenv..."
 if ! virtualenv -v COMMAND &> /dev/null
 then
-    echo
+    echo 
     echo "Need to have virtualenv to install requirements"
     echo "use: apt install virtualenv python3-virtualenv"
     exit 1
@@ -75,4 +75,8 @@ echo
 export FLASK_APP=main.py
 export FLASK_ENV=development
 
+<<<<<<< HEAD
 flask run
+=======
+flask run
+>>>>>>> 1669d0047dc38a3da20c8fb7689a48f4be7f34dd
