@@ -59,7 +59,6 @@ pipeline {
             steps {
                 sh """
                 docker-compose build """
-                // sh "docker-compose up -d"
             }
             post {
                 failure {
@@ -100,6 +99,58 @@ pipeline {
                 }
             }
         }
+
+        stage ('Deploy to Staging') {
+            when {branch 'devops/Edson-Guerra'}
+            steps {
+               script {
+                        withCredentials([usernamePassword(
+                          credentialsId: 'nexus_eg_credentials',
+                          usernameVariable: 'USERNAME',
+                          passwordVariable: 'PASSWORD'
+                        )]) {
+
+                          sh """
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                            docker-compose up -d
+                          """
+                        }
+                    }
+                }
+            post {
+                always {
+                    script {
+                        sh "docker logout $PRIVATE_REGISTRY_URL"
+                    }
+                }
+            }
+        }
+
+        stage ('Acceptance Tests') {
+           when {branch 'devops/Edson-Guerra'}
+           steps {
+               sh "echo OK"
+            //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
+            //    sh "curl http://localhost:8003/hello/User | grep 'Hello User!'"
+            //    sh "curl http://localhost:8004/hello/ | grep 'Hello World!'"
+            //    sh "curl http://localhost:8004/hello/User | grep 'Hello User!'"
+           }
+        }
+
+        // stage ('Tag Prod Image') {
+        //    when {branch 'devops/Edson-Guerra'}
+        //    steps {
+        //        sh "docker tag $PRIVATE_REGISTRY_URL/$PROJECT_NAME:$TAG $PRIVATE_REGISTRY_URL/$PROJECT_NAME:$PROD_TAG"
+        //    }
+        //    post {
+        //        failure {
+        //            script {
+        //                sh "docker rmi \$(docker images --filter dangling=true -q)"
+        //            }
+        //        }
+        //    }
+        // }
     }
 
     post {
