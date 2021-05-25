@@ -82,8 +82,8 @@ pipeline {
                         )]) {
 
                           sh """
-                            sudo docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            sudo docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
                           """
                         }
                     }
@@ -92,8 +92,8 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "sudo docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                        sh "sudo docker logout \${NEXUS_IP_PORT}"
+                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                        sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
@@ -120,8 +120,8 @@ pipeline {
                         )]) {
                            // sh "sudo docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                           sh """
-                            sudo docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            sudo docker-compose up -d
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker-compose up -d
                           """
                         }
                     }
@@ -129,7 +129,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "sudo docker logout \${NEXUS_IP_PORT}"
+                        sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
@@ -152,7 +152,7 @@ pipeline {
                 TAG = "$SPROD_TAG"
             }
            steps {
-               sh "sudo docker-compose build"
+               sh "docker-compose build"
            }
            post {
                failure {
