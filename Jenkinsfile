@@ -123,7 +123,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker logout $PRIVATE_REGISTRY_URL"
+                        sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
@@ -140,19 +140,22 @@ pipeline {
            }
         }
 
-        // stage ('Tag Prod Image') {
-        //    when {branch 'devops/Edson-Guerra'}
-        //    steps {
-        //        sh "docker tag $PRIVATE_REGISTRY_URL/$PROJECT_NAME:$TAG $PRIVATE_REGISTRY_URL/$PROJECT_NAME:$PROD_TAG"
-        //    }
-        //    post {
-        //        failure {
-        //            script {
-        //                sh "docker rmi \$(docker images --filter dangling=true -q)"
-        //            }
-        //        }
-        //    }
-        // }
+        stage ('Tag Prod Image') {
+           when {branch 'devops/Edson-Guerra'}
+           environment {
+                TAG = "$SPROD_TAG"
+            }
+           steps {
+               sh "docker-compose build"
+           }
+           post {
+               failure {
+                   script {
+                       sh "docker rmi \$(docker images --filter dangling=true -q)"
+                   }
+               }
+           }
+        }
     }
 
     post {
