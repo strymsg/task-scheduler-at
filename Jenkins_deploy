@@ -8,9 +8,11 @@ pipeline {
         string(name: "TAG", defaultValue:  "${BUILD_NUMBER}-stg")
     }
 
-    agent (label: "${params.AGENT_NAME}")
+    agent { 
+        label "${params.AGENT_NAME}"
+    }
     stages {
-        stage("deploying") {
+        stage('deploying') {
             environment {
                 NEXUS_IP_PORT = "${NEXUS_IP_PORT}"
                 PROJECT_NAME = "${params.PROJECT_NAME}"
