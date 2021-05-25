@@ -143,7 +143,7 @@ pipeline {
         stage ('Tag Prod Image') {
            when {branch 'devops/Edson-Guerra'}
            environment {
-                TAG = "$SPROD_TAG"
+                TAG = "$PROD_TAG"
             }
            steps {
                sh "docker-compose build"
