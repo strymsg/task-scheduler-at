@@ -1,7 +1,7 @@
 pipeline {
 
-    agent {label 'agent-eg'}
-    //agent {label 'jenkins-agent-01'}
+    //agent {label 'agent-eg'}
+    agent {label 'jenkins-agent-01'}
 
     environment {
         STAGING_TAG = "${BUILD_NUMBER}-stg"
@@ -35,40 +35,41 @@ pipeline {
             }
         }
 
-         stage('Static code analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonarqube-scanner-at'
-                    withSonarQubeEnv('sonarqube-automation') {
-                        sh """${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectName=$PROJECT_NAME \
-                        -Dsonar.projectKey=$PROJECT_NAME \
-                        -Dsonar.sources=."""
-                    }
-                }
-             }
-        }
+        //  stage('Static code analysis') {
+        //     steps {
+        //         script {
+        //             def scannerHome = tool 'sonarqube-scanner-at'
+        //             withSonarQubeEnv('sonarqube-automation') {
+        //                 sh """${scannerHome}/bin/sonar-scanner \
+        //                 -Dsonar.projectName=$PROJECT_NAME \
+        //                 -Dsonar.projectKey=$PROJECT_NAME \
+        //                 -Dsonar.sources=."""
+        //             }
+        //         }
+        //      }
+        // }
 
         stage("Building with Docker") {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "devops/Rodrigo-Garcia"}
             environment {
                 TAG = "$STAGING_TAG"
             }
             steps {
                 sh """
-                docker-compose build """
+                sudo docker-compose build """
             }
             post {
                 failure {
                     script {
-                        sh "docker rmi \$(docker images --filter dangling=true -q)"
+                        sh 'Falied docker-compose build'
+                        //sh "sudo docker rmi \$(docker images --filter dangling=true -q)"
                     }
                 }
             }
         }
 
         stage('Promote Image') {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "devops/Rodrigo-Garcia"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -81,8 +82,8 @@ pipeline {
                         )]) {
 
                           sh """
-                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                            sudo docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            sudo docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
                           """
                         }
                     }
@@ -91,17 +92,24 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                        sh "docker logout \${NEXUS_IP_PORT}"
+                        sh "sudo docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                        sh "sudo docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
         }
 
         stage ('Deploy to Staging') {
-            when {branch 'devops/Edson-Guerra'}
+            when {branch 'devops/Rodrigo-Garcia'}
             environment {
                 TAG = "$STAGING_TAG"
+                // probando volviendo a definir
+                STAGING_TAG = "${BUILD_NUMBER}-stg"
+                PROD_TAG = "${BUILD_NUMBER}-prod"
+                PROJECT_NAME = "app-task-scheduler"
+                PACKAGE_MONGO = "mongodb"
+                PACKAGE_REDIS = "redis-server"
+                NEXUS_IP_PORT = "10.28.108.180:8123"
             }
             steps {
                script {
@@ -110,10 +118,10 @@ pipeline {
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
-//                           sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                           // sh "sudo docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                           sh """
-                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker-compose up -d
+                            sudo docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            sudo docker-compose up -d
                           """
                         }
                     }
@@ -121,7 +129,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker logout \${NEXUS_IP_PORT}"
+                        sh "sudo docker logout \${NEXUS_IP_PORT}"
                     }
                 }
             }
@@ -139,17 +147,18 @@ pipeline {
         }
 
         stage ('Tag Prod Image') {
-           when {branch 'devops/Edson-Guerra'}
+           when {branch 'devops/Rodrigo-Garica'}
            environment {
                 TAG = "$SPROD_TAG"
             }
            steps {
-               sh "docker-compose build"
+               sh "sudo docker-compose build"
            }
            post {
                failure {
                    script {
-                       sh "docker rmi \$(docker images --filter dangling=true -q)"
+                       sh "echo 'paso fallido'"
+                       // sh "sudo docker rmi \$(docker images --filter dangling=true -q)"
                    }
                }
            }
