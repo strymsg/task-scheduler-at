@@ -102,6 +102,9 @@ pipeline {
 
         stage ('Deploy to Staging') {
             when {branch 'devops/Edson-Guerra'}
+            environment {
+                TAG = "$STAGING_TAG"
+            }
             steps {
                script {
                         withCredentials([usernamePassword(
