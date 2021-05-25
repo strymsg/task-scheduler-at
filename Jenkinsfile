@@ -54,7 +54,7 @@ pipeline {
         stage("Building with Docker") {
             when {branch "devops/Edson-Guerra"}
             environment {
-                TAG = $STAGING_TAG
+                TAG = "$STAGING_TAG"
             }
             steps {
                 sh """
@@ -73,7 +73,7 @@ pipeline {
         stage('Promote Image') {
             when {branch "devops/Edson-Guerra"}
             environment {
-                TAG = $STAGING_TAG
+                TAG = "$STAGING_TAG"
             }
             steps{
                 script {
