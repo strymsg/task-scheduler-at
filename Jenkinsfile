@@ -112,10 +112,9 @@ pipeline {
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
-
+//                           sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                           sh """
                             docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
                             docker-compose up -d
                           """
                         }
