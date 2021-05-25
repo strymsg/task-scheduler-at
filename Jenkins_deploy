@@ -1,20 +1,27 @@
 pipeline {
-    parameters {
-        string(name: 'AGENT_NAME', defaultValue: 'jenkins-agent-01')
-        string(name: 'NEXUS_IP_PORT', defaultValue: '10.28.108.180:8123')
-        string(name: 'NEXUS_CREDENTIALS', defaultValue: 'nexus_eg_credentials')
-        string(name: 'AGENT_NAME', defaultValue: 'jenkins-agent-01')
+    parameters{
+        string(name: "AGENT_NAME", defaultValue: "jenkins-agent-01")
+        string(name: "NEXUS_IP_PORT", defaultValue: "10.28.108.180:8123")
+        string(name: "NEXUS_CREDENTIALS", defaultValue: "nexus_eg_credentials")
+        string(name: "AGENT_NAME", defaultValue: "jenkins-agent-01")
+        string(name: "PROJECT_NAME", defaultValue: "app-task-scheduler")
+        string(name: "TAG", defaultValue:  "${BUILD_NUMBER}-stg")
     }
 
-    agent (label '${params.AGENT_NAME}')
+    agent (label "${params.AGENT_NAME}")
     stages {
-        stage('deploying') {
+        stage("deploying") {
+            environment {
+                NEXUS_IP_PORT = "${NEXUS_IP_PORT}"
+                PROJECT_NAME = "${params.PROJECT_NAME}"
+                TAG = "${params.TAG}"
+            }
             steps {
                 script {
                     // here should pull the image from the registry
                     // ...
                     sh """
-                    docker compose up -d
+                    docker compose up -d -f docker-compose-deploy.yml
                     """
                 }
             }
