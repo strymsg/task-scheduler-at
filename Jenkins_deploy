@@ -1,0 +1,28 @@
+pipeline {
+    parameters {
+        string(name: 'AGENT_NAME', defaultValue: 'jenkins-agent-01')
+        string(name: 'NEXUS_IP_PORT', defaultValue: '10.28.108.180:8123')
+        string(name: 'NEXUS_CREDENTIALS', defaultValue: 'nexus_eg_credentials')
+        string(name: 'AGENT_NAME', defaultValue: 'jenkins-agent-01')
+    }
+
+    agent (label '${params.AGENT_NAME}')
+    stages {
+        stage('deploying') {
+            steps {
+                script {
+                    // here should pull the image from the registry
+                    // ...
+                    sh """
+                    docker compose up -d
+                    """
+                }
+            }
+            post {
+                always {
+                    sh "docker ps"
+                }
+            }
+        }
+    }
+}
