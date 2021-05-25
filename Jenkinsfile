@@ -18,6 +18,7 @@ pipeline {
         stage("Prepare Environment") {
             steps {
                 sh """
+                    echo "Empezando el pipeline"
                     sudo apt-get update &&  sudo apt-get -y install python3.7 && sudo apt-get -y install python3-pip \
                         && sudo apt-get -y install python3-venv && sudo apt-get -y install \${PACKAGE_MONGO} \
                         && sudo apt-get -y install \${PACKAGE_REDIS} && sudo apt-get -y install tox
