@@ -8,7 +8,7 @@ pipeline {
         string(name: "TAG", defaultValue:  "${BUILD_NUMBER}-stg")
     }
 
-    agent (label "${params.AGENT_NAME}")
+    agent (label: "${params.AGENT_NAME}")
     stages {
         stage("deploying") {
             environment {
