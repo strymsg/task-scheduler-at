@@ -11,6 +11,8 @@ services:
       - mongo
     networks:
       - jenkins
+    ports:
+      - 5000:5000
   redis:
     container_name: REDIS_${PROJECT_CONTAINER}
     image: redis

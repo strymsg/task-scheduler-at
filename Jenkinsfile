@@ -73,6 +73,15 @@ pipeline {
             }
         }
         
+        stage('Deploying') {
+            steps {
+                sh """
+                    docker-compose up
+                    docker images
+                """
+            }
+        }
+
         stage('Promote Image') {
             steps{
                 script {
