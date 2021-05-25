@@ -2,7 +2,7 @@ version: "3.9"
 services:
   web:
     build: .
-    container_name: web_${PROJECT_NAME}:${TAG}
+    container_name: web_${PROJECT_NAME}-${TAG}
     image: ${NEXUS_IP_PORT}/${PROJECT_NAME}:${TAG}
     volumes:
       - .:/usr/src/app
@@ -14,12 +14,12 @@ services:
     networks:
       - jenkins
   redis:
-    container_name: redis_${PROJECT_NAME}:${TAG}
+    container_name: redis_${PROJECT_NAME}-${TAG}
     image: redis
     networks:
       - jenkins
   mongo:
-    container_name: mongo_${PROJECT_NAME}:${TAG}
+    container_name: mongo_${PROJECT_NAME}-${TAG}
     image: mongo
     networks:
       - jenkins
