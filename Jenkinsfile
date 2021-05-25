@@ -94,7 +94,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                         sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
