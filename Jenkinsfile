@@ -132,11 +132,11 @@ pipeline {
                 }
 
             post {
-                success {
+                /*success {
                     script {
                         sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-stg" -q)"""
                     }
-                }
+                }*/
                 always {
                     script {
                         sh "docker logout \${NEXUS_IP_PORT}"
@@ -215,12 +215,12 @@ pipeline {
                }
             }
 
-            post {
+            post {/*
                 success {
                     script {
                         sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-prod" -q)"""
                     }
-                }
+                }*/
             }
         }
     }
