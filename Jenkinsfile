@@ -33,9 +33,9 @@ pipeline {
         stage('UnitTests') {
             steps {
                 sh "source \$WORKSPACE/venv/bin/activate"
-                // sh "tox -vvv"
-                sh "coverage run -m unittest test_*.py"
-                sh "coverage xml"
+                sh "tox -vvv"
+//                 sh "coverage run -m unittest test_*.py"
+//                 sh "coverage xml"
             }
         }
 
