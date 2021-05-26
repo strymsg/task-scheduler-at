@@ -214,14 +214,14 @@ pipeline {
                    sh "docker-compose up -d"
                }
             }
-
-            post {/*
+            /*
+            post {
                 success {
                     script {
                         sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-prod" -q)"""
                     }
-                }*/
-            }
+                }
+            }*/
         }
     }
 
