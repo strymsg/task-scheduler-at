@@ -121,8 +121,8 @@ pipeline {
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
-//                           sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                          //sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
+                        //    sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                        // sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
                           sh """
                             docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
                             docker-compose up -d
@@ -130,10 +130,12 @@ pipeline {
                         }
                     }
                 }
+
             post {
                 success {
                     script {
                         sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-stg" -q)"""
+                    }
                 }
                 always {
                     script {
