@@ -102,7 +102,6 @@ pipeline {
             post {
                 always {
                     script {
-                        //sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                         sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
@@ -116,30 +115,15 @@ pipeline {
             }
             steps {
                script {
-                        withCredentials([usernamePassword(
-                          credentialsId: 'nexus_eg_credentials',
-                          usernameVariable: 'USERNAME',
-                          passwordVariable: 'PASSWORD'
-                        )]) {
-                        //    sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                        // sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
-                          sh """
-                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker-compose up -d
-                          """
+                        sh "docker-compose up -d"
                         }
                     }
                 }
 
             post {
-                /*success {
+                success {
                     script {
-                        sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-stg" -q)"""
-                    }
-                }*/
-                always {
-                    script {
-                        sh "docker logout \${NEXUS_IP_PORT}"
+                        sh "docker image prune -a -f"
                     }
                 }
             }
@@ -197,7 +181,6 @@ pipeline {
             post {
                 always {
                     script {
-                        //sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                         sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
@@ -214,14 +197,13 @@ pipeline {
                    sh "docker-compose up -d"
                }
             }
-            /*
             post {
                 success {
                     script {
-                        sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-prod" -q)"""
+                        sh "docker image prune -a -f"
                     }
                 }
-            }*/
+            }
         }
     }
 
