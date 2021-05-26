@@ -69,6 +69,13 @@ pipeline {
              }
         }
 
+        stage ("Quality Gate") {
+            steps {
+                timeout(time: 1, unit:"HOURS"){
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
         stage("Building with Docker") {
             when {branch "devops/Edson-Guerra"}
