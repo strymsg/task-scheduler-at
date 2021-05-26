@@ -54,21 +54,6 @@ pipeline {
              }
         }
 
-         stage('Static code analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonarqube-scanner-at'
-                    withSonarQubeEnv('sonarqube-automation') {
-                        sh """${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectName=$PROJECT_NAME \
-                        -Dsonar.python.coverage.reportPaths=coverage.xml \
-                        -Dsonar.projectKey=$PROJECT_NAME \
-                        -Dsonar.sources=."""
-                    }
-                }
-             }
-        }
-
         stage ("Quality Gate") {
             steps {
                 timeout(time: 1, unit:"HOURS"){
