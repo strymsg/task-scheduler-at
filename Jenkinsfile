@@ -9,7 +9,8 @@ pipeline {
         PROJECT_NAME = "app-task-scheduler"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
-        NEXUS_IP_PORT = "10.28.108.180:8123"
+        //NEXUS_IP_PORT = "10.28.108.180:8123"
+        NEXUS_IP_PORT = "10.28.108.154:8083"
     }
 
     stages {
@@ -24,6 +25,7 @@ pipeline {
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
                     pip3 install tox
+                    pip3 install coverage
                     pip3 install wheel"""
             }
         }
@@ -31,7 +33,9 @@ pipeline {
         stage('UnitTests') {
             steps {
                 sh """source \$WORKSPACE/venv/bin/activate
-                      tox -vvv """
+                      tox -vvv 
+                      coverage xml
+                      """
             }
         }
 
@@ -56,7 +60,10 @@ pipeline {
             }
             steps {
                 sh """
-                sudo docker-compose build """
+                docker-compose build 
+                echo
+                docker images --filter dangling=true -q
+                """
             }
             post {
                 failure {
@@ -68,53 +75,47 @@ pipeline {
             }
         }
 
-        stage('Promote Image') {
-            when {branch "devops/Rodrigo-Garcia"}
-            environment {
-                TAG = "$STAGING_TAG"
-            }
-            steps{
-                script {
-                        withCredentials([usernamePassword(
-                          credentialsId: 'nexus_eg_credentials',
-                          usernameVariable: 'USERNAME',
-                          passwordVariable: 'PASSWORD'
-                        )]) {
+        // stage('Promote Image') {
+        //     when {branch "devops/Rodrigo-Garcia"}
+        //     environment {
+        //         TAG = "$STAGING_TAG"
+        //     }
+        //     steps{
+        //         script {
+        //                 withCredentials([usernamePassword(
+        //                   credentialsId: 'nexus_eg_credentials',
+        //                   usernameVariable: 'USERNAME',
+        //                   passwordVariable: 'PASSWORD'
+        //                 )]) {
 
-                          sh """
-                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
-                          """
-                        }
-                    }
-                }
+        //                   sh """
+        //                     docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+        //                     docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+        //                   """
+        //                 }
+        //         }
+        //     }
 
-            post {
-                always {
-                    script {
-                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                        sh "docker logout \${NEXUS_IP_PORT}"
-                    }
-                }
-            }
-        }
+        //     post {
+        //         always {
+        //             script {
+        //                 sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+        //                 sh "docker logout \${NEXUS_IP_PORT}"
+        //             }
+        //         }
+        //     }
+        // }
 
         stage ('Deploy to Staging') {
             when {branch 'devops/Rodrigo-Garcia'}
             environment {
                 TAG = "$STAGING_TAG"
-                // probando volviendo a definir
-                STAGING_TAG = "${BUILD_NUMBER}-stg"
-                PROD_TAG = "${BUILD_NUMBER}-prod"
-                PROJECT_NAME = "app-task-scheduler"
-                PACKAGE_MONGO = "mongodb"
-                PACKAGE_REDIS = "redis-server"
-                NEXUS_IP_PORT = "10.28.108.180:8123"
             }
             steps {
                script {
                         withCredentials([usernamePassword(
-                          credentialsId: 'nexus_eg_credentials',
+                          //credentialsId: 'nexus_eg_credentials',
+                          credentialsId: 'sonatype-nexus-at-rodrigo'
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
@@ -136,7 +137,7 @@ pipeline {
         }
 
         stage ('Acceptance Tests') {
-           when {branch 'devops/Edson-Guerra'}
+           when {branch 'devops/Rodrigo-Garcia'}
            steps {
                sh "echo OK"
             //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"

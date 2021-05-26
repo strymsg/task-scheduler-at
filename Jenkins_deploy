@@ -23,7 +23,7 @@ pipeline {
                     // here should pull the image from the registry
                     // ...
                     sh """
-                    docker compose up -d -f docker-compose-deploy.yml
+                    docker-compose -f docker-compose-deploy.yml up -d 
                     """
                 }
             }
