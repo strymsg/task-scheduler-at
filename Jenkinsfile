@@ -60,7 +60,7 @@ pipeline {
             }
         }
 
-        stage("Building with Docker") {
+        stage("Building Staging Image") {
             when {branch "devops/Edson-Guerra"}
             environment {
                 TAG = "$STAGING_TAG"
@@ -78,7 +78,7 @@ pipeline {
             }
         }
 
-        stage('Promote Image') {
+        stage('Promote Staging Image') {
             when {branch "devops/Edson-Guerra"}
             environment {
                 TAG = "$STAGING_TAG"
@@ -131,6 +131,10 @@ pipeline {
                     }
                 }
             post {
+                success {
+                    script {
+                        sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-stg" -q)"""
+                }
                 always {
                     script {
                         sh "docker logout \${NEXUS_IP_PORT}"
@@ -150,8 +154,8 @@ pipeline {
            }
         }
 
-        stage ('Tag Prod Image') {
-           when {branch 'devops/Edson-Guerra'}
+        stage ('Building Prod Image') {
+           when {branch 'main'}
            environment {
                 TAG = "$PROD_TAG"
             }
@@ -165,6 +169,57 @@ pipeline {
                    }
                }
            }
+        }
+
+        stage('Promote Prod Image') {
+            when {branch "main"}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps{
+                script {
+                        withCredentials([usernamePassword(
+                          credentialsId: 'nexus_eg_credentials',
+                          usernameVariable: 'USERNAME',
+                          passwordVariable: 'PASSWORD'
+                        )]) {
+
+                          sh """
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                          """
+                        }
+                    }
+                }
+
+            post {
+                always {
+                    script {
+                        //sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                        sh "docker logout \${NEXUS_IP_PORT}"
+                    }
+                }
+            }
+        }
+
+        stage ('Deploy to Prod') {
+            when {branch 'main'}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps {
+               script {
+                   sh "docker-compose up -d"
+               }
+            }
+
+            post {
+                success {
+                    script {
+                        sh """docker rmi \$(docker images -f "reference=\${NEXUS_IP_PORT}/\${PROJECT_NAME}:*-prod" -q)"""
+                    }
+                }
+            }
         }
     }
 
