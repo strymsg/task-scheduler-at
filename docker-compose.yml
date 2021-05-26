@@ -6,6 +6,8 @@ services:
     image: ${NEXUS_IP_PORT}/${PROJECT_NAME}:${TAG}
     volumes:
       - .:/usr/src/app
+    ports:
+      - 5000:5000
     depends_on:
       - redis
       - mongo
@@ -14,12 +16,12 @@ services:
     ports:
       - 5000:5000
   redis:
-    container_name: REDIS_${PROJECT_CONTAINER}
+    container_name: redis_${PROJECT_NAME}-${TAG}
     image: redis
     networks:
       - jenkins
   mongo:
-    container_name: MONGO_${PROJECT_CONTAINER}
+    container_name: mongo_${PROJECT_NAME}-${TAG}
     image: mongo
     networks:
       - jenkins
