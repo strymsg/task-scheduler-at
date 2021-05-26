@@ -115,7 +115,7 @@ pipeline {
                script {
                         withCredentials([usernamePassword(
                           //credentialsId: 'nexus_eg_credentials',
-                          credentialsId: 'sonatype-nexus-at-rodrigo'
+                          credentialsId: 'sonatype-nexus-at-rodrigo',
                           usernameVariable: 'USERNAME',
                           passwordVariable: 'PASSWORD'
                         )]) {
