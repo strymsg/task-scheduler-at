@@ -32,8 +32,10 @@ pipeline {
 
         stage('UnitTests') {
             steps {
-                sh """source \$WORKSPACE/venv/bin/activate
-                      tox -vvv """
+                sh "source \$WORKSPACE/venv/bin/activate"
+                // sh "tox -vvv"
+                sh "coverage run -m unittest test_*.py"
+                sh "coverage xml"
             }
         }
 
@@ -44,6 +46,7 @@ pipeline {
                     withSonarQubeEnv('sonarqube-automation') {
                         sh """${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectName=$PROJECT_NAME \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml \
                         -Dsonar.projectKey=$PROJECT_NAME \
                         -Dsonar.sources=."""
                     }
@@ -93,7 +96,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                        //sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                         sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
@@ -113,6 +116,7 @@ pipeline {
                           passwordVariable: 'PASSWORD'
                         )]) {
 //                           sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
+                          //sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
                           sh """
                             docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
                             docker-compose up -d
