@@ -54,6 +54,22 @@ pipeline {
              }
         }
 
+         stage('Static code analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonarqube-scanner-at'
+                    withSonarQubeEnv('sonarqube-automation') {
+                        sh """${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectName=$PROJECT_NAME \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml \
+                        -Dsonar.projectKey=$PROJECT_NAME \
+                        -Dsonar.sources=."""
+                    }
+                }
+             }
+        }
+
+
         stage("Building with Docker") {
             when {branch "devops/Edson-Guerra"}
             environment {
