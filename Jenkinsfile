@@ -60,7 +60,7 @@ pipeline {
             }
         }
 
-        stage("Building with Docker") {
+        stage("Building Staging Image") {
             when {branch "devops/Edson-Guerra"}
             environment {
                 TAG = "$STAGING_TAG"
@@ -78,7 +78,7 @@ pipeline {
             }
         }
 
-        stage('Promote Image') {
+        stage('Promote Staging Image') {
             when {branch "devops/Edson-Guerra"}
             environment {
                 TAG = "$STAGING_TAG"
@@ -102,7 +102,6 @@ pipeline {
             post {
                 always {
                     script {
-                        //sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
                         sh "docker logout \${NEXUS_IP_PORT}"
                     }
                 }
@@ -116,24 +115,14 @@ pipeline {
             }
             steps {
                script {
-                        withCredentials([usernamePassword(
-                          credentialsId: 'nexus_eg_credentials',
-                          usernameVariable: 'USERNAME',
-                          passwordVariable: 'PASSWORD'
-                        )]) {
-//                           sh "docker pull \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}"
-                          //sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
-                          sh """
-                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker-compose up -d
-                          """
-                        }
+                        sh "docker-compose up -d"
                     }
                 }
+
             post {
-                always {
+                success {
                     script {
-                        sh "docker logout \${NEXUS_IP_PORT}"
+                        sh "docker image prune -a -f"
                     }
                 }
             }
@@ -150,8 +139,8 @@ pipeline {
            }
         }
 
-        stage ('Tag Prod Image') {
-           when {branch 'devops/Edson-Guerra'}
+        stage ('Building Prod Image') {
+           when {branch 'main'}
            environment {
                 TAG = "$PROD_TAG"
             }
@@ -165,6 +154,55 @@ pipeline {
                    }
                }
            }
+        }
+
+        stage('Promote Prod Image') {
+            when {branch "main"}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps{
+                script {
+                        withCredentials([usernamePassword(
+                          credentialsId: 'nexus_eg_credentials',
+                          usernameVariable: 'USERNAME',
+                          passwordVariable: 'PASSWORD'
+                        )]) {
+
+                          sh """
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                          """
+                        }
+                    }
+                }
+
+            post {
+                always {
+                    script {
+                        sh "docker logout \${NEXUS_IP_PORT}"
+                    }
+                }
+            }
+        }
+
+        stage ('Deploy to Prod') {
+            when {branch 'main'}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps {
+               script {
+                   sh "docker-compose up -d"
+               }
+            }
+            post {
+                success {
+                    script {
+                        sh "docker image prune -a -f"
+                    }
+                }
+            }
         }
     }
 
