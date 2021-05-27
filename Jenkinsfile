@@ -76,13 +76,6 @@ pipeline {
                     }
                 }
             }
-            post {
-                failure {
-                    script {
-                        sh "docker rmi \$(docker images --filter dangling=true -q)"
-                    }
-                }
-            }
         }
 
         stage('Promote Staging Image') {
@@ -105,6 +98,7 @@ pipeline {
                         }
                     }
                 }
+
             post {
                 always {
                     script {
@@ -138,6 +132,10 @@ pipeline {
            when {branch 'devops/Edson-Guerra'}
            steps {
                sh "echo OK"
+            //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
+            //    sh "curl http://localhost:8003/hello/User | grep 'Hello User!'"
+            //    sh "curl http://localhost:8004/hello/ | grep 'Hello World!'"
+            //    sh "curl http://localhost:8004/hello/User | grep 'Hello User!'"
            }
         }
 
