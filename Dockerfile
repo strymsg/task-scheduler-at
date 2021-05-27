@@ -1,4 +1,6 @@
 FROM python:3.9-slim-buster
+ENV MONGO_CONTAINER="mongo"
+ENV REDIS_CONTAINER="redis"
 ENV FLASK_APP=main.py
 ENV FLASK_ENV=development
 WORKDIR /usr/src/app

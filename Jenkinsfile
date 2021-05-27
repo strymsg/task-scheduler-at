@@ -4,10 +4,9 @@ pipeline {
     //agent {label 'jenkins-agent-01'}
 
     environment {
-        IMAGE_NAME = "app-task-scheduler:${BUILD_NUMBER}"
-        PROM_IMAGE_NAME = "app-task-scheduler"
-        PROJECT_PREFIX = "APP-TASK-SCHEDULER"
-        PROJECT_CONTAINER = "${env.PROJECT_PREFIX}-${BUILD_NUMBER}"
+        STAGING_TAG = "${BUILD_NUMBER}-stg"
+        PROD_TAG = "${BUILD_NUMBER}-prod"
+        PROJECT_NAME = "app-task-scheduler"
         PACKAGE_MONGO = "mongodb"
         PACKAGE_REDIS = "redis-server"
         NEXUS_IP_PORT = "10.28.108.180:8123"
@@ -22,7 +21,7 @@ pipeline {
                         && sudo apt-get -y install \${PACKAGE_REDIS} && sudo apt-get -y install tox
 
                     sudo service mongodb start && sudo service redis-server start
-                    
+
                     python3 -m venv \$WORKSPACE/venv
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
@@ -30,7 +29,7 @@ pipeline {
                     pip3 install wheel"""
             }
         }
-        
+
         stage('UnitTests') {
             steps {
                 sh """source \$WORKSPACE/venv/bin/activate
@@ -41,26 +40,41 @@ pipeline {
          stage('Static code analysis') {
             steps {
                 script {
-                    // SonarQube Scanner Installation name = sonarqube-scanner-at
-                    // Get the directory path where SonarQube Scanner
                     def scannerHome = tool 'sonarqube-scanner-at'
-                    // SonarQube Server name = sonarqube-automation
                     withSonarQubeEnv('sonarqube-automation') {
-                    // Set parameters to the sonar-scanner binary and run it
                         sh """${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectName=$PROJECT_PREFIX \
-                        -Dsonar.projectKey=$PROJECT_PREFIX \
+                        -Dsonar.projectName=$PROJECT_NAME \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml \
+                        -Dsonar.projectKey=$PROJECT_NAME \
                         -Dsonar.sources=."""
                     }
                 }
              }
         }
 
-        stage("Building with Docker") {
+        stage ("Quality Gate") {
+            steps {
+                timeout(time: 1, unit:"HOURS"){
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage("Building Staging Image") {
+            when {branch "devops/Edson-Guerra"}
+            environment {
+                TAG = "$STAGING_TAG"
+            }
             steps {
                 sh """
                 docker-compose build """
-                // sh "docker-compose up -d"
+            }
+            post {
+                failure {
+                    script {
+                        sh "docker rmi \$(docker images --filter dangling=true -q)"
+                    }
+                }
             }
             post {
                 failure {
@@ -70,8 +84,12 @@ pipeline {
                 }
             }
         }
-        
-        stage('Promote Image') {
+
+        stage('Promote Staging Image') {
+            when {branch "devops/Edson-Guerra"}
+            environment {
+                TAG = "$STAGING_TAG"
+            }
             steps{
                 script {
                         withCredentials([usernamePassword(
@@ -82,17 +100,108 @@ pipeline {
 
                           sh """
                             docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
-                            docker push \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}
+                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
                           """
                         }
                     }
                 }
-    
             post {
                 always {
                     script {
-                        sh "docker rmi -f \${NEXUS_IP_PORT}/\${PROM_IMAGE_NAME}:\${BUILD_NUMBER}"
                         sh "docker logout \${NEXUS_IP_PORT}"
+                    }
+                }
+            }
+        }
+
+        stage ('Deploy to Staging') {
+            when {branch 'devops/Edson-Guerra'}
+            environment {
+                TAG = "$STAGING_TAG"
+            }
+            steps {
+               script {
+                        sh "docker-compose up -d"
+                    }
+                }
+
+            post {
+                success {
+                    script {
+                        sh "docker image prune -a -f"
+                    }
+                }
+            }
+        }
+
+        stage ('Acceptance Tests') {
+           when {branch 'devops/Edson-Guerra'}
+           steps {
+               sh "echo OK"
+           }
+        }
+
+        stage ('Building Prod Image') {
+           when {branch 'main'}
+           environment {
+                TAG = "$PROD_TAG"
+            }
+           steps {
+               sh "docker-compose build"
+           }
+           post {
+               failure {
+                   script {
+                       sh "docker rmi \$(docker images --filter dangling=true -q)"
+                   }
+               }
+           }
+        }
+
+        stage('Promote Prod Image') {
+            when {branch "main"}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps{
+                script {
+                        withCredentials([usernamePassword(
+                          credentialsId: 'nexus_eg_credentials',
+                          usernameVariable: 'USERNAME',
+                          passwordVariable: 'PASSWORD'
+                        )]) {
+
+                          sh """
+                            docker login -u $USERNAME -p $PASSWORD \${NEXUS_IP_PORT}
+                            docker push \${NEXUS_IP_PORT}/\${PROJECT_NAME}:\${TAG}
+                          """
+                        }
+                    }
+                }
+
+            post {
+                always {
+                    script {
+                        sh "docker logout \${NEXUS_IP_PORT}"
+                    }
+                }
+            }
+        }
+
+        stage ('Deploy to Prod') {
+            when {branch 'main'}
+            environment {
+                TAG = "$PROD_TAG"
+            }
+            steps {
+               script {
+                   sh "docker-compose up -d"
+               }
+            }
+            post {
+                success {
+                    script {
+                        sh "docker image prune -a -f"
                     }
                 }
             }
@@ -102,7 +211,7 @@ pipeline {
     post {
         always {
             emailext body: """Hi Devs!\n\nJenkins reporting: Pipeline execution finished\n\nStatus: \"${currentBuild.currentResult}\"\nJob: ${env.JOB_NAME}\nBuild: ${env.BUILD_NUMBER}\nURL to more info at: ${env.BUILD_URL}""",
-            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
+            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
             subject: "${currentBuild.currentResult}: Jenkins Build (${env.BUILD_NUMBER}) Notification for Job: ${env.JOB_NAME}",
             to: '$DEFAULT_RECIPIENTS'
         }
