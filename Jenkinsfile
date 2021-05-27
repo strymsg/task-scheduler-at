@@ -132,10 +132,6 @@ pipeline {
            when {branch 'devops/Edson-Guerra'}
            steps {
                sh "echo OK"
-            //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8003/hello/User | grep 'Hello User!'"
-            //    sh "curl http://localhost:8004/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8004/hello/User | grep 'Hello User!'"
            }
         }
 
