@@ -61,7 +61,7 @@ pipeline {
         }
 
         stage("Building Staging Image") {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "develop"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -76,17 +76,10 @@ pipeline {
                     }
                 }
             }
-            post {
-                failure {
-                    script {
-                        sh "docker rmi \$(docker images --filter dangling=true -q)"
-                    }
-                }
-            }
         }
 
         stage('Promote Staging Image') {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "develop"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -105,6 +98,7 @@ pipeline {
                         }
                     }
                 }
+
             post {
                 always {
                     script {
@@ -115,7 +109,7 @@ pipeline {
         }
 
         stage ('Deploy to Staging') {
-            when {branch 'devops/Edson-Guerra'}
+            when {branch 'develop'}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -135,7 +129,7 @@ pipeline {
         }
 
         stage ('Acceptance Tests') {
-           when {branch 'devops/Edson-Guerra'}
+           when {branch 'develop'}
            steps {
                sh "echo OK"
            }
