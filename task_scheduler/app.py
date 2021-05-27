@@ -70,6 +70,8 @@ def create_app(test_config=None):
     docs.register(ApiRequestTaskExecEndpoint)
     docs.register(ApiRequestTaskByIdEndpoint)
     docs.register(DbTaskEndpoint)
+    docs.register(HelloMessage)
+
 
     config_obj = Configuration()
 
