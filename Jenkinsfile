@@ -115,6 +115,7 @@ pipeline {
             }
             steps {
                script {
+                        sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
                         sh "docker-compose up -d"
                     }
                 }
@@ -131,11 +132,11 @@ pipeline {
         stage ('Acceptance Tests') {
            when {branch 'devops/Edson-Guerra'}
            steps {
-               sh "echo OK"
-            //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8003/hello/User | grep 'Hello User!'"
-            //    sh "curl http://localhost:8004/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8004/hello/User | grep 'Hello User!'"
+               sh """
+               curl -I http://10.28.108.180:5000/api/v1/task/api-task/all | grep 200
+               curl -I http://10.28.108.180:5000/api/v1/task/api-task/task_Db | grep 200
+               """
+               
            }
         }
 
@@ -193,6 +194,7 @@ pipeline {
             }
             steps {
                script {
+                   sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
                    sh "docker-compose up -d"
                }
             }
