@@ -61,7 +61,8 @@ pipeline {
         }
 
         stage("Building Staging Image") {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "devops/Pipelines"}
+            agent {label: 'jenkins-agent-01'}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -70,7 +71,7 @@ pipeline {
                 docker-compose build """
             }
             post {
-                failure {
+                failure {Edson
                     script {
                         sh "docker rmi \$(docker images --filter dangling=true -q)"
                     }
@@ -79,7 +80,7 @@ pipeline {
         }
 
         stage('Promote Staging Image') {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "devops/Pipelines"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -109,7 +110,8 @@ pipeline {
         }
 
         stage ('Deploy to Staging') {
-            when {branch 'devops/Edson-Guerra'}
+            when {branch 'devops/Pipelines'}
+            agent {label 'jenkins-agent-01'}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -129,7 +131,7 @@ pipeline {
         }
 
         stage ('Acceptance Tests') {
-           when {branch 'devops/Edson-Guerra'}
+           when {branch 'devops/Pipelines'}
            steps {
                sh "echo OK"
             //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
