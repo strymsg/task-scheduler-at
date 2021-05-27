@@ -135,8 +135,7 @@ pipeline {
            steps {
                sh """
                curl -I http://10.28.108.180:5000/swagger | grep '200'
-               curl -I -X GET "http://10.28.108.180:5000/api/v1/task/api-task/all"  \\
-                   -H "accept: application/json" | grep "200 OK"
+               curl -I -X GET "http://10.28.108.180:5000/api/v1/task/api-task/all"  -H "accept: application/json" | grep "200 OK"
                echo "ok"
                """
            }
