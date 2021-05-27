@@ -1,4 +1,4 @@
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 import os
 import logging
 from flask import Flask, g
@@ -14,6 +14,7 @@ from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoin
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.endpoints.db_task_endpoint \
                             import DbTaskEndpoint
+from task_scheduler.endpoints.api_misc import HelloMessage                        
 from task_scheduler.utils.constants import API_ROUTES, HOST_MONGO
 
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
@@ -39,8 +40,6 @@ def init_db(app, db_configs):
             )
         g.db = mongo_connection
         app.mongo_connection = mongo_connection
-        print("Configs::::::")
-        print(db_configs)
     return g.db
 
 
@@ -62,6 +61,7 @@ def create_app(test_config=None):
     # restful api to manage endpoints
     api = Api(app)
     docs = FlaskApiSpec(app)
+    api.add_resource(HelloMessage, '/')
     api.add_resource(ApiRequestTaskExecEndpoint, API_ROUTES['API_TASK_EXECUTE'])
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['API_TASK_ALL'])
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['API_TASK'] + '/<string:task_id>')
