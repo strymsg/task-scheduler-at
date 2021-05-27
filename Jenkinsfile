@@ -71,7 +71,7 @@ pipeline {
                 docker-compose build """
             }
             post {
-                failure {Edson
+                failure {
                     script {
                         sh "docker rmi \$(docker images --filter dangling=true -q)"
                     }
