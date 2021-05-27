@@ -62,7 +62,7 @@ pipeline {
 
         stage("Building Staging Image") {
             when {branch "devops/Pipelines"}
-            agent {label 'jenkins-agent-01'}
+            //agent {label 'jenkins-agent-01'}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -111,7 +111,7 @@ pipeline {
 
         stage ('Deploy to Staging') {
             when {branch 'devops/Pipelines'}
-            agent {label 'jenkins-agent-01'}
+            //agent {label 'jenkins-agent-01'}
             environment {
                 TAG = "$STAGING_TAG"
             }
