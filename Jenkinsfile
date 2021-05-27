@@ -26,7 +26,7 @@ pipeline {
                     source \$WORKSPACE/venv/bin/activate
                     pip3 install -r requirements.dev.txt
                     pip3 install tox
-                    pip3 install wheel"""
+                    pip3 install wheel """
             }
         }
 
