@@ -133,11 +133,10 @@ pipeline {
         stage ('Acceptance Tests') {
            when {branch 'devops/Pipelines'}
            steps {
-               sh "echo OK"
-            //    sh "curl http://localhost:8003/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8003/hello/User | grep 'Hello User!'"
-            //    sh "curl http://localhost:8004/hello/ | grep 'Hello World!'"
-            //    sh "curl http://localhost:8004/hello/User | grep 'Hello User!'"
+               sh """
+               curl -I http://localhost:8003/swagger | grep '200'
+               curl -I -X GET "http://10.28.108.180:5000/api/v1/task/api-task/all" -H "accept: application/json" | grep "200 OK"
+               """
            }
         }
 
