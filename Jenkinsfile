@@ -76,6 +76,13 @@ pipeline {
                     }
                 }
             }
+            post {
+                failure {
+                    script {
+                        sh "docker rmi \$(docker images --filter dangling=true -q)"
+                    }
+                }
+            }
         }
 
         stage('Promote Staging Image') {
@@ -98,7 +105,6 @@ pipeline {
                         }
                     }
                 }
-
             post {
                 always {
                     script {
