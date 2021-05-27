@@ -115,6 +115,7 @@ pipeline {
             }
             steps {
                script {
+                        sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
                         sh "docker-compose up -d"
                     }
                 }
@@ -132,9 +133,15 @@ pipeline {
            when {branch 'develop'}
            steps {
                sh """
+<<<<<<< HEAD
                curl http://10.28.108.180:5000/ | grep "environment"
                """
                sh "echo OK"
+=======
+               curl -I http://10.28.108.180:5000/api/v1/task/api-task/all | grep 200
+               curl -I http://10.28.108.180:5000/api/v1/task/api-task/task_Db | grep 200
+               """
+>>>>>>> f4979d051113d414655e8ea5969b1b921c9ae242
            }
         }
 
@@ -192,7 +199,8 @@ pipeline {
             }
             steps {
                script {
-                   sh "docker-compose up -d"
+                    sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
+                    sh "docker-compose up -d"
                }
             }
             post {
