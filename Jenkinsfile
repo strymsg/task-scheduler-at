@@ -131,6 +131,9 @@ pipeline {
         stage ('Acceptance Tests') {
            when {branch 'develop'}
            steps {
+               sh """
+               curl http://10.28.108.180:5000/ | grep "environment"
+               """
                sh "echo OK"
            }
         }
