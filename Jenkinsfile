@@ -61,7 +61,7 @@ pipeline {
         }
 
         stage("Building Staging Image") {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "develop"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -79,7 +79,7 @@ pipeline {
         }
 
         stage('Promote Staging Image') {
-            when {branch "devops/Edson-Guerra"}
+            when {branch "develop"}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -109,7 +109,7 @@ pipeline {
         }
 
         stage ('Deploy to Staging') {
-            when {branch 'devops/Edson-Guerra'}
+            when {branch 'develop'}
             environment {
                 TAG = "$STAGING_TAG"
             }
@@ -130,13 +130,12 @@ pipeline {
         }
 
         stage ('Acceptance Tests') {
-           when {branch 'devops/Edson-Guerra'}
+           when {branch 'develop'}
            steps {
                sh """
                curl -I http://10.28.108.180:5000/api/v1/task/api-task/all | grep 200
                curl -I http://10.28.108.180:5000/api/v1/task/api-task/task_Db | grep 200
                """
-               
            }
         }
 
@@ -194,8 +193,8 @@ pipeline {
             }
             steps {
                script {
-                   sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
-                   sh "docker-compose up -d"
+                    sh "docker rm -f \$(docker ps --filter name=$PROJECT_NAME* -q)"
+                    sh "docker-compose up -d"
                }
             }
             post {
