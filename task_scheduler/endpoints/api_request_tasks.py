@@ -17,7 +17,7 @@ class ApiRequestExecuteTaskSchema(Schema):
     url = fields.String(required=True, description='The URL to do the request')
     http_method = fields.String(required=True, description='The HTTP METHOD for the request')
     headers = fields.Dict(description='Headers of the request')
-    body = fields.Dict(description='Request Body (if exists)')
+    body = fields.Dict(description='Request Body (if  exists)')
     api_token = fields.String()
 
 
