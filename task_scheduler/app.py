@@ -14,8 +14,7 @@ from task_scheduler.endpoints.api_request_tasks import ApiRequestTaskByIdEndpoin
     ApiRequestTasksEndpoint, ApiRequestTaskExecEndpoint
 from task_scheduler.endpoints.db_task_endpoint \
                             import DbTaskEndpoint
-#uncomment this line
-# from task_scheduler.endpoints.api_misc import HelloMessage                        
+from task_scheduler.endpoints.api_misc import HelloMessage                        
 from task_scheduler.utils.constants import API_ROUTES, HOST_MONGO
 
 from task_scheduler.tasks.abstract_db_connector import MongoDbConnection
@@ -62,8 +61,7 @@ def create_app(test_config=None):
     # restful api to manage endpoints
     api = Api(app)
     docs = FlaskApiSpec(app)
-    #uncomment this line
-    # api.add_resource(HelloMessage, '/')
+    api.add_resource(HelloMessage, '/')
     api.add_resource(ApiRequestTaskExecEndpoint, API_ROUTES['API_TASK_EXECUTE'])
     api.add_resource(ApiRequestTasksEndpoint, API_ROUTES['API_TASK_ALL'])
     api.add_resource(ApiRequestTaskByIdEndpoint, API_ROUTES['API_TASK'] + '/<string:task_id>')
@@ -72,8 +70,7 @@ def create_app(test_config=None):
     docs.register(ApiRequestTaskExecEndpoint)
     docs.register(ApiRequestTaskByIdEndpoint)
     docs.register(DbTaskEndpoint)
-    #uncomment this line
-    # docs.register(HelloMessage)
+    docs.register(HelloMessage)
 
 
     config_obj = Configuration()
